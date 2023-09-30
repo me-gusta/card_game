@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <title>Game Cards</title>
+</head>
+<body>
+<div id="app">
+
+
+    <!--   wrap   -->
+    <div class="wrap">
+        <div class="board"></div>
+
+
+        <div class="statistics">
+            <div class="statistics-hp">
+                <span class="hp">20</span> /
+                <span class="hp-max">20</span>
+            </div>
+            <div class="statistics-portrait">
+
+            </div>
+        </div>
+        <div class="hand"></div>
+
+
+    </div>
+    <!--   /wrap   -->
+    <div class="debug-data">
+        <pre class="debug-text"></pre>
+    </div>
+    <div class="debug-ui">
+        <button class="play">
+            flip all
+        </button>
+    </div>
+
+
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
