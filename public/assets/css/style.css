@@ -71,6 +71,7 @@ img {
   font-size: 40px;
   position: relative;
   width: 100%;
+  z-index: 3;
 }
 .card-side {
   width: 10%;
