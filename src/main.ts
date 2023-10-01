@@ -2,16 +2,16 @@ import anime from 'animejs/lib/anime.es.js';
 import {flip_card} from "./animations/flip";
 import {extract_digits, find_image, img_css, new_element, sleep} from "./animations/helpers";
 import {getRandomInt, in_array, range, round, shuffleArray} from "./game/helpers";
-import {attacking_card, bounce_card, collect_card} from "./animations/interactions";
+import {anim_use_card, anim_bounce_card, anim_collect_card} from "./animations/interactions";
 import {recreate_world, world} from "./game/create_world";
 import create from "./game/create";
 import {one_v2} from "./game/rng";
 import actions from "./game/actions";
 import {
     CardVariant,
-    InHand,
+    InHand, InLootPile,
     IsChosen,
-    IsFaded,
+    IsFaded, LootId,
     OnBoard,
     OnCardAttacked,
     OnSwap,
@@ -28,6 +28,48 @@ const app = document.querySelector('#app')
 
 const board = document.querySelector('.board')
 
+const anim_toggle_card = (i) => {
+    const ent = world.qo(new InHand(i))
+    const card = document.querySelector('#card-hand' + i)
+    const class_list = card.parentElement.classList
+
+    const is_active = class_list.contains('active')
+
+    if (ent === undefined) {
+        class_list.remove('active')
+        anime({
+            targets: card,
+            duration: 100,
+            easing: 'easeOutQuad',
+            opacity: 0,
+            scale: 0.6
+        })
+        return
+    }
+
+    console.log(is_active, ent.get(IsChosen))
+
+    if (is_active && ent.get(IsChosen)) return
+
+    if (is_active) {
+        class_list.remove('active')
+        anime({
+            targets: card,
+            duration: 100,
+            easing: 'easeOutQuad',
+            opacity: 0,
+            scale: 0.6
+        })
+    } else {
+        choose_card(card)
+    }
+}
+
+const anim_hand_selection = () => {
+    for (let i = 0; i < 3; i++) {
+        anim_toggle_card(i)
+    }
+}
 
 const choose_card = (card) => {
     card.parentNode.classList.add('active')
@@ -41,8 +83,6 @@ const choose_card = (card) => {
             {scale: 0.9},
         ],
         easing: 'easeOutQuad',
-        complete: () => {
-        }
     })
 
 }
@@ -97,6 +137,45 @@ const anim_swipe = (keyA, keyB) => {
     flip_card(elemB)
 }
 
+const check_dead = () => {
+    for (let ent of world.q(Value, OnBoard)) {
+        if (ent.get(Value) > 0) continue
+
+        const key = ent.get(OnBoard)
+        if (ent.has(LootId)) {
+            const loot_card = world.qe(ent.get(LootId))
+            loot_card.remove(InLootPile)
+            loot_card.add(new OnBoard(key))
+        } else {
+            const coin = create.coin()
+            coin.add(new OnBoard(key))
+        }
+        world.killEntity(ent)
+
+        console.log(key)
+
+        const card = document.querySelector('#card-' + key)
+        flip_card(card)
+    }
+
+    for (let ent of world.q(Value, InHand)) {
+        if (ent.get(Value) > 0) continue
+
+        const key = ent.get(InHand)
+        world.killEntity(ent)
+
+        const card = document.querySelector('#card-hand' + key)
+        // flip_card(card, true)
+    }
+}
+
+const set_hand_card_value = (ent) => {
+    const card = document.querySelector('#card-hand' + ent.get(InHand)).querySelector('.card-value')
+    card.textContent = ent.get(Value)
+}
+
+
+
 const process_event = (data) => {
 
     const action = data.action
@@ -148,17 +227,25 @@ const process_event = (data) => {
         const {on_choice} = weapons_map.get(active_item.get(CardVariant))
         console.log('activate card')
         on_choice(active_item, target)
+
+        anim_use_card(active_item)
+        set_hand_card_value(active_item)
         // parse_all()
 
         world.q(OnCardAttacked, OnBoard).forEach(ent => {
             const {on_card_attacked} = mobs_map.get(ent.get(CardVariant))
             on_card_attacked(ent, target, active_item)
         })
+
+        setTimeout(() => {
+            check_dead()
+            actions.ensure_active_item()
+            setTimeout(anim_hand_selection, 100)
+        }, 250)
         // parse_all()
         // await check_dead()
         // parse_all()
 
-        actions.ensure_active_item()
         // parse_all()
 
 
@@ -261,14 +348,16 @@ const create_board = () => {
 
 const create_hand = () => {
     const hand = document.querySelector('.hand')
-    let i = 0
-    world.q(InHand).forEach(ent => {
+
+    for (let i = 0; i < 3; i ++) {
+        const ent = world.qo(new InHand(i))
+
         const card = create_card({
             i: 'hand' + i,
             ent: ent
         })
         hand.appendChild(card)
-    })
+    }
 }
 
 const show_debug_data = (...data) => {
@@ -381,14 +470,14 @@ const start_turn = async () => {
     await sleep(200)
     // await check_dead()
 
-    const hand = document.querySelector('.hand')
+    anim_hand_selection()
+    // const hand = document.querySelector('.hand')
 
-    world.q(InHand).forEach(ent => {
-
-        const elem = hand.querySelector('#card-hand' + ent.get(InHand))
-        console.log(elem)
-        choose_card(elem)
-    })
+    // world.q(InHand).forEach(ent => {
+    //     const elem = hand.querySelector('#card-hand' + ent.get(InHand))
+    //     console.log(elem)
+    //     choose_card(elem)
+    // })
 }
 
 const flip_all = async () => {
@@ -400,8 +489,13 @@ const flip_all = async () => {
     }
 }
 
+const end_turn = () => {
+    console.log('end turn')
+}
+
 const main = async () => {
     document.querySelector('.play').addEventListener('click', flip_all)
+    document.querySelector('.next-turn').addEventListener('click', end_turn)
 
     setup()
 

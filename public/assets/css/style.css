@@ -57,7 +57,6 @@ img {
 .card-wrap {
   position: relative;
   display: flex;
-  transition: 0.1s all ease-in;
 }
 .card-wrap.active {
   background: #eea671;
@@ -149,6 +148,16 @@ img {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   padding: 20px;
+}
+
+.next-turn {
+  background: #bd8051;
+  width: 48px;
+  height: 100%;
+  color: #492d16;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /*# sourceMappingURL=style.css.map */

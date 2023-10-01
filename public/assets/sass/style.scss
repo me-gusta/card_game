@@ -66,7 +66,7 @@ img {
 .card-wrap {
   position: relative;
   display: flex;
-  transition: 0.1s all ease-in;
+  //transition: 0.1s all ease-in;
 
   &.active {
     background: $theme3;
@@ -171,3 +171,13 @@ img {
   padding: 20px;
 }
 
+
+.next-turn {
+  background: #bd8051;
+  width: 48px;
+  height: 100%;
+  color: $theme1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

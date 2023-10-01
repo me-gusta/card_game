@@ -162,20 +162,6 @@ const deselect = () => {
 
 }
 
-export const remove_one_dead = () => {
-    for (let ent of world.q(Value)) {
-        if (ent.get(Value) > 0) continue
-        if (ent.has(LootId)) {
-            const loot_card = world.qe(ent.get(LootId))
-            loot_card.remove(InLootPile)
-            loot_card.add(new OnBoard(ent.get(OnBoard)))
-        }
-        world.killEntity(ent)
-        return true
-    }
-
-    return false
-}
 
 const ensure_active_item = () => {
     const current = world.qo(InHand, IsChosen)

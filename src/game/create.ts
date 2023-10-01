@@ -9,14 +9,15 @@ import {
     InHand,
     InLootPile,
     InUpcomingPile,
-    LootId, OnBoard,
+    LootId,
+    OnBoard,
     PlayerData,
-    RoundData, RunData,
+    RoundData,
+    RunData,
     SetupData,
     Value
 } from "./components";
-import {getRandomInt, range, round, shuffleArray} from "./helpers";
-import rng from "./rng";
+import {getRandomInt, range, shuffleArray} from "./helpers";
 import {from_v, v} from "./local_math";
 import {weapons_map} from "./behaviours/weapons";
 import {mobs_map} from "./behaviours/mobs";
@@ -48,6 +49,14 @@ const mob = (variant, key, position_component=OnBoard) => {
         new Enemy(),
     )
 }
+
+const coin = () => {
+    return world.createEntity(
+        new Value(getRandomInt(10, 15)),
+        new CardType(E_CardType.coin),
+    )
+}
+
 
 const upcoming = (data) => {
     console.log(data)
@@ -190,5 +199,6 @@ export default {
     upcoming,
     godlike,
     hand,
-    mob
+    mob,
+    coin
 }

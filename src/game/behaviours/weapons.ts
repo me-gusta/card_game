@@ -7,6 +7,7 @@ import create from "../create";
 import filters from "../filters";
 import {half_or_kill} from "./util";
 import get_godlike from "../get_godlike";
+import {anim_bounce_card} from "../../animations/interactions";
 
 const calc_damage = (actor, target) => {
 
@@ -18,6 +19,13 @@ const calc_damage = (actor, target) => {
     } else {
         return value
     }
+}
+
+const anim_deal_damage = (ent) => {
+    const key = ent.get(OnBoard)
+    const card = document.querySelector('#card-' + key)
+    anim_bounce_card(card)
+    card.querySelector('.card-value').textContent = ent.get(Value)
 }
 
 export const weapons_map = new Map([
@@ -32,6 +40,8 @@ export const weapons_map = new Map([
             const dmg = calc_damage(actor, target)
 
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
+
             actor.modify(Value).sub(dmg)
         }
     }],

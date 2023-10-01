@@ -1,7 +1,7 @@
 import anime from "animejs/lib/anime.es";
 import {extract_digits, find_image, img_css, img_url} from "./helpers";
 import {world} from "../game/create_world";
-import {OnBoard, Value} from "../game/components";
+import {InHand, OnBoard, Value} from "../game/components";
 
 const duration = 200
 const ease1 = 'easeOutQuad'
@@ -123,16 +123,16 @@ const prepare_for_rotate = (card) => {
     })
 }
 
-const update_card = (card) => {
+const update_card = (card, in_hand=false) => {
     const id = extract_digits(card.id)
 
-    const ent = world.qo(new OnBoard(id))
+    const ent = in_hand ? world.qo(new InHand(id)) : world.qo(new OnBoard(id))
 
     const img = card.parentNode.querySelector('.card-img')
     const icon = card.parentNode.querySelector('.card-icon')
 
     const bg_icon = anime.get(icon, 'background-image')
-    const url_icon = find_image(ent, true)
+    const url_icon = ent ? find_image(ent, true) : ''
 
     anime.set(icon, {
         'background-image': `${url_icon}`,
@@ -146,10 +146,10 @@ const update_card = (card) => {
         // 'background-image': url,
     // })
     const value = card.parentNode.querySelector('.card-value')
-    value.textContent = ent.get(Value)
+    value.textContent = ent ? ent.get(Value) : ''
 }
 
-export const flip_card = (card) => {
+export const flip_card = (card, in_hand=false) => {
 
     anime.set(card, {
         translateX: 0,
@@ -172,7 +172,7 @@ export const flip_card = (card) => {
     })
 
     show_right_edge(card).finished.then(() => {
-        update_card(card)
+        update_card(card, in_hand)
         prepare_for_rotate(card)
         setTimeout(
             () => rotate_edge_right(card),

@@ -1,7 +1,8 @@
 import anime from "animejs/lib/anime.es.js";
+import {InHand} from "../game/components";
 
 
-export const bounce_card = (card) => {
+export const anim_bounce_card = (card) => {
     anime.timeline({
         targets: card.parentNode,
     }).add({
@@ -9,7 +10,7 @@ export const bounce_card = (card) => {
         scaleY: 0.9,
 
         easing: 'easeOutQuint',
-        duration: 100,
+        duration: 10,
         keyframes: [
             {rotate: 3},
             {rotate: -3},
@@ -30,30 +31,28 @@ export const bounce_card = (card) => {
 }
 
 
-export const attacking_card = (card) => {
+export const anim_use_card = (ent) => {
+    const card = document.querySelector('#card-hand' + ent.get(InHand))
     anime.timeline({
         targets: card,
     }).add({
         // scaleX: 0.9,
         scaleY: 0.8,
-        translateY: '30%',
+        translateY: '-10%',
 
         easing: 'easeOutQuint',
-        duration: 100,
+        duration: 50,
+    }).add({
+        scaleX: 1,
+        scaleY: 1,
+        translateY: '0%',
+        easing: 'easeInQuint',
+        duration: 100
     })
-        .add(
-        {
-            scaleX: 1,
-            scaleY: 1,
-            translateY: '0%',
-            easing: 'easeInQuint',
-            duration: 200
-        }
-    )
 }
 
 
-export const collect_card = (card) => {
+export const anim_collect_card = (card) => {
     anime.timeline({
         targets: card,
     }).add({
