@@ -14,6 +14,14 @@ import {Vector} from "../esc/vector";
 import {weapons_map} from "./behaviours/weapons";
 import {in_array} from "./helpers";
 import {mobs_map} from "./behaviours/mobs";
+import {
+    anim_attack_card,
+    anim_collect_card,
+    anim_fade_card,
+    anim_hero_take_damage,
+    anim_new_weapon
+} from "../animations/interactions";
+import {update_card} from "../animations/flip";
 
 const init_board = () => {
     for (let y = 0; y < 4; y++) {
@@ -46,6 +54,7 @@ const consume_card = (on_board_id: number) => {
         case E_CardType.food: {
             player.hp = Math.min(player.hp + value, player.hp_max)
             clear_effects()
+            anim_collect_card(card)
             world.killEntity(card)
             break
         }
@@ -55,11 +64,14 @@ const consume_card = (on_board_id: number) => {
             if (on_consume)
                 on_consume(card)
             player.hp -= value
+            anim_attack_card(card)
+            anim_hero_take_damage()
             world.killEntity(card)
             break
         }
         case E_CardType.coin: {
             player.coins += value
+            anim_collect_card(card)
             world.killEntity(card)
             break
         }
@@ -67,6 +79,7 @@ const consume_card = (on_board_id: number) => {
             const loot_id = card.get(LootId)
             if (loot_id !== undefined)
                 world.killEntity(loot_id)
+            anim_fade_card(card)
 
             world.killEntity(card)
             break
@@ -87,8 +100,13 @@ const consume_card = (on_board_id: number) => {
                 }
                 in_hand_id = 2
             }
+            anim_collect_card(card)
+
             card.remove(OnBoard)
             card.add(new InHand(in_hand_id))
+
+            update_card(document.querySelector('#card-hand'+in_hand_id), true)
+            anim_new_weapon(in_hand_id)
             break
         }
     }

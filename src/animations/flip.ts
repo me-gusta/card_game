@@ -123,7 +123,7 @@ const prepare_for_rotate = (card) => {
     })
 }
 
-const update_card = (card, in_hand=false) => {
+export const update_card = (card, in_hand=false) => {
     const id = extract_digits(card.id)
 
     const ent = in_hand ? world.qo(new InHand(id)) : world.qo(new OnBoard(id))
@@ -168,7 +168,7 @@ export const flip_card = (card, in_hand=false) => {
             {scale: 1},
         ],
         easing: ease1,
-        duration: duration * 2 + 50
+        duration: duration + 50
     })
 
     show_right_edge(card).finished.then(() => {

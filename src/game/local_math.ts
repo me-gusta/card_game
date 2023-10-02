@@ -5,7 +5,7 @@ import type {Entity} from "../esc/entity";
 
 export const v = (x, y) => new Vector(x, y)
 
-export const from_v = (vec: Vector) => {
+export const from_v = (vec: Vector|Array<number>) => {
     vec = Vector.ensure(vec)
     return vec.y * 3 + vec.x
 }

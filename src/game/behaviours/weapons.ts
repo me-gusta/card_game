@@ -52,6 +52,7 @@ export const weapons_map = new Map([
 
             relative(target, [], pattern_around).forEach(ent => {
                 ent.modify(Value).sub(dmg)
+                anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
         }
@@ -63,6 +64,7 @@ export const weapons_map = new Map([
 
             relative(target, [], pattern_row).forEach(ent => {
                 ent.modify(Value).sub(dmg)
+                anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
         }

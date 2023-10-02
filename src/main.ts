@@ -1,5 +1,5 @@
 import anime from 'animejs/lib/anime.es.js';
-import {flip_card} from "./animations/flip";
+import {flip_card, update_card} from "./animations/flip";
 import {extract_digits, find_image, img_css, new_element, sleep} from "./animations/helpers";
 import {getRandomInt, in_array, range, round, shuffleArray} from "./game/helpers";
 import {anim_use_card, anim_bounce_card, anim_collect_card} from "./animations/interactions";
@@ -19,7 +19,7 @@ import {
     Value
 } from "./game/components";
 import {touch_end, touch_move, touch_start} from "./animations/card_movement";
-import {from_v, to_v} from "./game/local_math";
+import {from_v, to_v, v} from "./game/local_math";
 import get_godlike from "./game/get_godlike";
 import {weapons_map} from "./game/behaviours/weapons";
 import {mobs_map} from "./game/behaviours/mobs";
@@ -51,16 +51,16 @@ const anim_toggle_card = (i) => {
 
     if (is_active && ent.get(IsChosen)) return
 
-    if (is_active) {
+    if (is_active && !ent.get(IsChosen)) {
         class_list.remove('active')
-        anime({
-            targets: card,
-            duration: 100,
-            easing: 'easeOutQuad',
-            opacity: 0,
-            scale: 0.6
-        })
-    } else {
+        // anime({
+        //     targets: card,
+        //     duration: 100,
+        //     easing: 'easeOutQuad',
+        //     opacity: 0,
+        //     scale: 0.6
+        // })
+    } else if (ent.get(IsChosen)) {
         choose_card(card)
     }
 }
@@ -174,9 +174,12 @@ const set_hand_card_value = (ent) => {
     card.textContent = ent.get(Value)
 }
 
+let can_process = true
 
 
 const process_event = (data) => {
+
+    if (!can_process) return;
 
     const action = data.action
     const key = data.key
@@ -184,7 +187,11 @@ const process_event = (data) => {
 
     console.log(action, location, key)
 
+
+
     if (action.startsWith('swipe') && location === 'board') {
+        can_process = false
+
         const player = get_godlike.player_data()
         if (player.swipe_points === 0)
             return
@@ -213,6 +220,10 @@ const process_event = (data) => {
 
         player.swipe_points -= 1
         // await check_dead()
+
+        setTimeout(() => {
+            can_process = true
+        }, 250)
         return
     }
 
@@ -252,6 +263,7 @@ const process_event = (data) => {
     } else {
         actions.deselect()
         actions.select_item_from_hand(key)
+        anim_hand_selection()
         // parse_all()
     }
 
@@ -270,6 +282,8 @@ const card_event = (elem) => {
 const create_card = (cfg: { i, ent? }) => {
     const {i, ent} = cfg
 
+    const location = (i).toString().includes('hand') ? 'card-hand' : 'card-board'
+
     let value = ''
     let img = ''
 
@@ -278,7 +292,7 @@ const create_card = (cfg: { i, ent? }) => {
         img = find_image(ent, true)
     }
 
-    const card = new_element(`<div class="card" id="card-${i}"></div>`)
+    const card = new_element(`<div class="card ${location}" id="card-${i}"></div>`)
 
     card.ontouchend = touch_end(card, card_event(card))
     card.ontouchstart = touch_start(card)
@@ -489,8 +503,97 @@ const flip_all = async () => {
     }
 }
 
-const end_turn = () => {
+const move_deck = async () => {
+
+    for (let x = 2; x >= 0; x--) {
+        actions.consume_card(x)
+        // board = parse_board()
+        // board[x] = undefined
+
+        // hand = parse_hand()
+        await sleep(250)
+
+    }
+
+    for (let y = 1; y < 4; y++) {
+        for (let x = 0; x < 3; x++) {
+            actions.move_down_on_board(v(x, y))
+        }
+    }
+
+    anime({
+        targets: '.card-board',
+        translateY: '112%',
+        duration: 500,
+        complete: () => {
+            for (let y = 0; y < 4; y++) {
+                for (let x = 0; x < 3; x++) {
+                    const elem = document.querySelector('#card-' + from_v([x, y]))
+                    if (y === 3) {
+                        anime.set(elem,{
+                            translateY: '-130%',
+                            opacity: 1,
+                            scaleX: 1,
+                            scaleY: 1,
+                            scale: 1,
+                        })
+
+                        anime.set(elem.parentElement, {
+                            'z-index': 10
+                        })
+                        continue
+                    }
+
+                    update_card(elem)
+                    anime.set(elem, {
+                        translateY: '0%',
+                        opacity: 1,
+                        scale: 1,
+                        scaleX: 1,
+                        scaleY: 1,
+                    })
+                }
+            }
+
+            for (let x = 0; x < 3; x++) {
+                actions.add_new_on_board(v(x, 3))
+                const elem = document.querySelector('#card-' + from_v([x, 3]))
+                update_card(elem)
+                anime({
+                    targets: elem,
+                    translateY: '0%',
+                    duration: 500,
+                    opacity: 1,
+                })
+            }
+
+
+        }
+    })
+
+
+    // return
+
+
+}
+
+const end_turn = async () => {
     console.log('end turn')
+    actions.end_turn()
+
+    check_dead()
+
+    const pd = get_godlike.player_data()
+    pd.swipe_points = 2
+
+    await move_deck()
+    actions.ensure_active_item()
+    actions.ensure_faded()
+
+    // check_finished()
+
+
+    await start_turn()
 }
 
 const main = async () => {
