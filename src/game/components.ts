@@ -40,9 +40,6 @@ export class PlayerData extends C_Object<any> {
 }
 
 
-export class RunData extends C_Object<any> {
-}
-
 export class LootId extends C_Immutable<number> {
 }
 

@@ -17,11 +17,12 @@ import {mobs_map} from "./behaviours/mobs";
 import {
     anim_attack_card,
     anim_collect_card,
-    anim_fade_card,
+    anim_fade_card, anim_hero_heal,
     anim_hero_take_damage,
-    anim_new_weapon
+    anim_new_weapon, anim_weapon_exit, anim_weapon_move
 } from "../animations/interactions";
 import {update_card} from "../animations/flip";
+import anime from "animejs/lib/anime.es.js";
 
 const init_board = () => {
     for (let y = 0; y < 4; y++) {
@@ -45,6 +46,7 @@ const consume_card = (on_board_id: number) => {
         CardType
     )
 
+
     if (card === undefined) return
 
     const value = card.get(Value)
@@ -55,6 +57,7 @@ const consume_card = (on_board_id: number) => {
             player.hp = Math.min(player.hp + value, player.hp_max)
             clear_effects()
             anim_collect_card(card)
+            anim_hero_heal()
             world.killEntity(card)
             break
         }
@@ -87,27 +90,71 @@ const consume_card = (on_board_id: number) => {
 
         case E_CardType.weapon: {
             const in_hand = world.q(InHand)
+            in_hand.sort((a, b) => a.get(InHand) - b.get(InHand))
+
+            console.log(in_hand.map(ent => {return {
+                id:ent.id, in_hand: ent.get(InHand)
+            }}))
+
             let in_hand_id = in_hand.length
             if (in_hand.length === 3) {
                 for (let i = 0; i < in_hand.length; i++) {
                     const card_in_hand = in_hand[i]
                     if (i === 0) {
                         world.killEntity(card_in_hand)
+                        anim_weapon_exit(i)
                     } else {
                         card_in_hand.remove(InHand)
                         card_in_hand.add(new InHand(i - 1))
+                        anim_weapon_move(i)
+                        // update_card(document.querySelector('#card-hand' + (i - 1)), true)
                     }
                 }
                 in_hand_id = 2
+
+                setTimeout(() => {
+                    for (let i = 0; i < in_hand.length; i++) {
+                        const elem = document.querySelector('#card-hand' + i)
+                        update_card(elem, true)
+                        if (i !== 2)
+                            anime.set(elem, {
+                                translateX: 0
+                            })
+                    }
+                    anim_collect_card(card)
+
+                    card.remove(OnBoard)
+                    card.add(new InHand(in_hand_id))
+                    update_card(document.querySelector('#card-hand' + in_hand_id), true)
+
+                    anime.set('#card-hand' + 2, {
+                        translateX: 0,
+                        opacity: 0
+                    })
+                    anim_new_weapon(2)
+
+                }, 110)
+            } else {
+                if (in_hand.length === 2) {
+                    const a = in_hand[0].get(InHand)
+                    const b = in_hand[1].get(InHand)
+                    console.log(a, b)
+                    if (a === 0 && b === 2)
+                        in_hand_id = 1
+                    if (a === 1 && b === 2)
+                        in_hand_id = 0
+
+                }
+                anim_collect_card(card)
+
+                card.remove(OnBoard)
+                card.add(new InHand(in_hand_id))
+
+                update_card(document.querySelector('#card-hand' + in_hand_id), true)
+                anim_new_weapon(in_hand_id)
             }
-            anim_collect_card(card)
 
-            card.remove(OnBoard)
-            card.add(new InHand(in_hand_id))
 
-            update_card(document.querySelector('#card-hand'+in_hand_id), true)
-            anim_new_weapon(in_hand_id)
-            break
         }
     }
 

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {C_Enum, Component} from "./component"
 import type {Entity, EntityId} from "./entity"
 import type {System} from "./system"
@@ -276,9 +277,9 @@ export class World {
                 }
             }
             this._addComponents(ent.id, components)
-            components.forEach(c => {
-                ent[getName(c).toLowerCase()] = c.value
-            })
+            // components.forEach(c => {
+            //     ent[getName(c).toLowerCase()] = c.value
+            // })
         }
     }
 

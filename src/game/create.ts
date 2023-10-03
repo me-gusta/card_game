@@ -13,7 +13,6 @@ import {
     OnBoard,
     PlayerData,
     RoundData,
-    RunData,
     SetupData,
     Value
 } from "./components";
@@ -61,9 +60,7 @@ const coin = () => {
 const upcoming = (data) => {
     console.log(data)
     const cards = shuffleArray(data.cards)
-    const {turns} = world.qo(SetupData).get(SetupData)
-
-    for (let y of range(turns))
+    for (let y of range(cards.length / 3))
         for (let x of range(3)) {
 
             // let {type, variant} = rng.card(is_good)
@@ -185,13 +182,12 @@ const godlike = (run_data) => {
             turn: 0
         }),
         new PlayerData({
-            hp_max: 20,
+            hp_max: run_data.player.hp_max,
             hp: run_data.player.hp,
             coins: 0,
             swipe_points: 2,
             swipe_points_max: 2
-        }),
-        new RunData({...run_data})
+        })
     )
 }
 

@@ -1,13 +1,22 @@
 import type {Entity} from "../../esc/entity";
 import {CardType, CardVariant, E_CardType, InLootPile, LootId, OnBoard, Value} from "../components";
-import {pattern_around, pattern_row, relative, select} from "../local_math";
+import {
+    pattern_around,
+    pattern_chess,
+    pattern_closest,
+    pattern_col, pattern_farthest,
+    pattern_row,
+    relative,
+    select
+} from "../local_math";
 import {world} from "../create_world";
-import {getRandomChoice, getRandomInt, pick_n_random} from "../helpers";
+import {getRandomChoice, getRandomInt, in_array, pick_n_random, shuffleArray} from "../helpers";
 import create from "../create";
 import filters from "../filters";
 import {half_or_kill} from "./util";
 import get_godlike from "../get_godlike";
 import {anim_bounce_card} from "../../animations/interactions";
+import actions from "../actions";
 
 const calc_damage = (actor, target) => {
 
@@ -57,16 +66,179 @@ export const weapons_map = new Map([
             actor.modify(Value).sub(dmg)
         }
     }],
-    ['whip', {
+    ['scythe', {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             relative(target, [], pattern_row).forEach(ent => {
                 ent.modify(Value).sub(dmg)
-                anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['whip', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            relative(target, [], pattern_col).forEach(ent => {
+                ent.modify(Value).sub(dmg)
+            })
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['shuriken', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            let target_two
+            shuffleArray(world.q(OnBoard)).forEach(ent => {
+                if (ent.id !== target.id)
+                    target_two = ent
+            })
+            target.modify(Value).sub(dmg)
+            target_two.modify(Value).sub(dmg)
+
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['shovel', {
+        value_range: [2, 4],
+        pattern: pattern_chess,
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            target.modify(Value).sub(dmg)
+
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['dagger', {
+        value_range: [2, 4],
+        pattern: pattern_closest,
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            target.modify(Value).sub(dmg)
+
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['frying_pan', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+            const value_target = target.get(Value)
+            target.modify(Value).sub(dmg)
+
+            if (target.get(Value) <= 0) {
+                const loot = world.createEntity(
+                    new InLootPile(),
+                    new Value(value_target),
+                    new CardType(E_CardType.food),
+                    new CardVariant('omlet'),
+                )
+                target.add(
+                    new LootId(loot.id)
+                )
+            }
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['stick', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+            target.modify(Value).sub(dmg)
+
+            actor.modify(Value).set(0)
+        }
+    }],
+    ['spear', {
+        value_range: [2, 4],
+        pattern: pattern_farthest,
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+            target.modify(Value).sub(dmg)
+
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['knuckles', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+            target.modify(Value).sub(dmg)
+
+            if (target.get(Value) <= 0) {
+                if (target.has(LootId)) {
+                    const loot = world.qe(target.get(LootId))
+                    if (loot.get(CardType) === E_CardType.coin)
+                        loot.modify(Value).mul(10)
+                }
+            }
+
+            actor.modify(Value).sub(dmg)
+        }
+    }],
+    ['crowbar', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            if (target.get(CardType) === E_CardType.crate) {
+                target.modify(Value).set(0)
+            } else {
+                target.modify(Value).sub(dmg)
+                actor.modify(Value).sub(dmg)
+            }
+
+        }
+    }],
+    ['katana', {
+        value_range: [2, 4],
+        pattern: [[1, 1], [1, 2]],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+            select([], [[1, 1], [1, 2]]).forEach(ent => {
+
+                ent.modify(Value).sub(dmg)
+            })
+            actor.modify(Value).sub(dmg)
+
+        }
+    }],
+    ['nunchaku', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            target.modify(Value).sub(dmg)
+            actor.modify(Value).sub(dmg)
+            if (getRandomInt(0, 1) === 1) {
+                const player_data = get_godlike.player_data()
+                player_data.hp -= dmg
+            }
+
+        }
+    }],
+    ['rake', {
+        value_range: [2, 4],
+        on_choice: (actor: Entity, target: Entity) => {
+            const dmg = calc_damage(actor, target)
+
+            if ( in_array([E_CardType.food, E_CardType.weapon],  target.get(CardType))) {
+                const value_target= target.get(Value)
+                actor.modify(Value).sub(Math.floor(value_target / 2))
+
+                actions.consume_card(target.get(OnBoard))
+            } else {
+                target.modify(Value).sub(dmg)
+                actor.modify(Value).sub(dmg)
+            }
+
         }
     }],
 

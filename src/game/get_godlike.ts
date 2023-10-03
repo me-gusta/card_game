@@ -1,5 +1,7 @@
 import {world} from "./create_world";
-import {GodLike, PlayerData, RoundData, RunData} from "./components";
+import {GodLike, PlayerData, RoundData} from "./components";
+import {RunData} from "../global/components";
+import {world_global} from "../global/create_world";
 
 const godlike = () => {
     return world.qo(GodLike)
@@ -14,7 +16,7 @@ const player_data = () => {
 }
 
 const run_data = () => {
-    return world.qo(RunData).get(RunData)
+    return world_global.qo(RunData).get(RunData)
 }
 
 

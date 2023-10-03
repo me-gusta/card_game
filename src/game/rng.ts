@@ -4,6 +4,8 @@ import {mobs_map} from "./behaviours/mobs";
 import {weapons_map} from "./behaviours/weapons";
 import {food_map} from "./behaviours/food";
 import get_godlike from "./get_godlike";
+import {world_global} from "../global/create_world";
+import {GeneratorData} from "../global/components";
 
 const card_data = () => {
     let type
@@ -103,10 +105,10 @@ const get_map_entry = (tag, variant) => {
     }
 }
 
-export const one_v2 = (tag) => {
-    const run_data = get_godlike.run_data()
-    const level_probabilities = run_data.level_probabilities
-    const multiplier = run_data.multiplier
+export const one_v2 = (tag,) => {
+    const generator_data = world_global.qo(GeneratorData).get(GeneratorData)
+    const level_probabilities = generator_data.level_probabilities
+    const multiplier = generator_data.multiplier
     const probabilities = level_probabilities.get(tag)
     const dice = getRandomInt(1, 100)
     let sum = 0
@@ -114,10 +116,12 @@ export const one_v2 = (tag) => {
         sum += prob
         const type = card_variations_map.get(variant)
         if (type === undefined)
-            throw 'CARD IS UNKNOWN. PLS ADD IT TO LIBRARY'
+            throw `CARD "${variant}" IS UNKNOWN. PLS ADD IT TO LIBRARY`
         if (dice <= sum) {
             const {value_range} = get_map_entry(tag, variant)
-            const value = getRandomInt(...value_range) * multiplier
+            const value = Math.round(
+                getRandomInt(...value_range) * multiplier
+            )
             return {
                 variant,
                 type,
