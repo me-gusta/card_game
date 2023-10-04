@@ -50,3 +50,6 @@ export const find_image = (ent, for_css = false) => {
         for_css
     )
 }
+
+
+export const q = (selector) : HTMLElement => document.querySelector(selector)

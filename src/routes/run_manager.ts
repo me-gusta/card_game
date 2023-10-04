@@ -1,9 +1,8 @@
 import {getRandomChoice, round} from "../game/helpers";
 import {purge, world_global} from "../global/create_world";
-import {GodLike} from "../game/components";
+import {GeneratorData, GodLike, LevelData, RunData} from "../game/components";
 import {one_v2} from "../game/rng";
 import {show_debug_data} from "../debug";
-import {GeneratorData, LevelData, RunData} from "../global/components";
 import {init_route} from "../routing";
 import routes from "../routes";
 

@@ -17,6 +17,7 @@ import {half_or_kill} from "./util";
 import get_godlike from "../get_godlike";
 import {anim_bounce_card} from "../../animations/interactions";
 import actions from "../actions";
+import {i18n} from "../../localization";
 
 const calc_damage = (actor, target) => {
 
@@ -52,7 +53,8 @@ export const weapons_map = new Map([
             anim_deal_damage(target)
 
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['mace', {
         value_range: [2, 3],
@@ -64,7 +66,8 @@ export const weapons_map = new Map([
                 anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['scythe', {
         value_range: [2, 4],
@@ -75,7 +78,8 @@ export const weapons_map = new Map([
                 ent.modify(Value).sub(dmg)
             })
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['whip', {
         value_range: [2, 4],
@@ -86,7 +90,8 @@ export const weapons_map = new Map([
                 ent.modify(Value).sub(dmg)
             })
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['shuriken', {
         value_range: [2, 4],
@@ -102,7 +107,8 @@ export const weapons_map = new Map([
             target_two.modify(Value).sub(dmg)
 
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['shovel', {
         value_range: [2, 4],
@@ -113,7 +119,8 @@ export const weapons_map = new Map([
             target.modify(Value).sub(dmg)
 
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['dagger', {
         value_range: [2, 4],
@@ -124,7 +131,8 @@ export const weapons_map = new Map([
             target.modify(Value).sub(dmg)
 
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['frying_pan', {
         value_range: [2, 4],
@@ -145,7 +153,8 @@ export const weapons_map = new Map([
                 )
             }
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['stick', {
         value_range: [2, 4],
@@ -154,7 +163,8 @@ export const weapons_map = new Map([
             target.modify(Value).sub(dmg)
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['spear', {
         value_range: [2, 4],
@@ -164,7 +174,8 @@ export const weapons_map = new Map([
             target.modify(Value).sub(dmg)
 
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['knuckles', {
         value_range: [2, 4],
@@ -181,7 +192,8 @@ export const weapons_map = new Map([
             }
 
             actor.modify(Value).sub(dmg)
-        }
+        },
+        description: '',
     }],
     ['crowbar', {
         value_range: [2, 4],
@@ -195,7 +207,8 @@ export const weapons_map = new Map([
                 actor.modify(Value).sub(dmg)
             }
 
-        }
+        },
+        description: '',
     }],
     ['katana', {
         value_range: [2, 4],
@@ -208,7 +221,8 @@ export const weapons_map = new Map([
             })
             actor.modify(Value).sub(dmg)
 
-        }
+        },
+        description: '',
     }],
     ['nunchaku', {
         value_range: [2, 4],
@@ -222,15 +236,16 @@ export const weapons_map = new Map([
                 player_data.hp -= dmg
             }
 
-        }
+        },
+        description: '',
     }],
     ['rake', {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
-            if ( in_array([E_CardType.food, E_CardType.weapon],  target.get(CardType))) {
-                const value_target= target.get(Value)
+            if (in_array([E_CardType.food, E_CardType.weapon], target.get(CardType))) {
+                const value_target = target.get(Value)
                 actor.modify(Value).sub(Math.floor(value_target / 2))
 
                 actions.consume_card(target.get(OnBoard))
@@ -239,7 +254,8 @@ export const weapons_map = new Map([
                 actor.modify(Value).sub(dmg)
             }
 
-        }
+        },
+        description: '',
     }],
 
     // spells
@@ -248,7 +264,7 @@ export const weapons_map = new Map([
         on_choice: (actor: Entity, target: Entity) => {
             target.modify(Value).mul(2)
             actor.modify(Value).set(0)
-        }
+        },
     }],
     ['make_moose', {
         value_range: [1, 1],
@@ -259,7 +275,8 @@ export const weapons_map = new Map([
             create.mob('moose', key)
             actor.modify(Value).set(0)
 
-        }
+        },
+        description: '',
     }],
     ['luxury_dinner', {
         value_range: [1, 1],
@@ -280,7 +297,8 @@ export const weapons_map = new Map([
             })
             actor.modify(Value).set(0)
 
-        }
+        },
+        description: '',
     }],
     ['liquidate', {
         value_range: [1, 1],
@@ -293,7 +311,8 @@ export const weapons_map = new Map([
             )
             enemy.modify(Value).set(0)
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['recruit', {
         value_range: [1, 1],
@@ -317,7 +336,8 @@ export const weapons_map = new Map([
             )
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['disinfect', {
         value_range: [1, 1],
@@ -339,7 +359,8 @@ export const weapons_map = new Map([
             })
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['harvest', {
         value_range: [1, 1],
@@ -357,7 +378,8 @@ export const weapons_map = new Map([
             })
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['calm_down', {
         value_range: [1, 1],
@@ -367,7 +389,8 @@ export const weapons_map = new Map([
             })
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['grenade', {
         value_range: [1, 1],
@@ -381,7 +404,8 @@ export const weapons_map = new Map([
             })
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['imperfection', {
         value_range: [1, 1],
@@ -401,7 +425,8 @@ export const weapons_map = new Map([
             })
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['blood_donation', {
         value_range: [1, 1],
@@ -415,7 +440,8 @@ export const weapons_map = new Map([
             })
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['grocery', {
         value_range: [1, 1],
@@ -435,7 +461,8 @@ export const weapons_map = new Map([
             )
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['master_key', {
         value_range: [1, 1],
@@ -450,7 +477,8 @@ export const weapons_map = new Map([
             target.modify(Value).set(0)
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
     ['elementary', {
         value_range: [1, 1],
@@ -462,6 +490,7 @@ export const weapons_map = new Map([
             target.modify(Value).mul(4)
 
             actor.modify(Value).set(0)
-        }
+        },
+        description: '',
     }],
 ])

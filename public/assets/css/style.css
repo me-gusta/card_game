@@ -173,4 +173,38 @@ img {
   color: #dbc2a3;
 }
 
+.slider {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider .card {
+  width: 150px !important;
+  height: 150px !important;
+}
+
+.slider-control {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.row {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+}
+
+.in-use {
+  gap: 30px;
+}
+
+.in-use .card {
+  width: 85px !important;
+  height: 85px !important;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -2,10 +2,10 @@ import {run_level} from "./routes/level";
 import {init_route} from "./routing";
 import {get_run_data, get_segment, init_run, print_segments} from "./routes/run_manager";
 import {world} from "./game/create_world";
-import {GodLike} from "./game/components";
-import {LevelResults, RunData} from "./global/components";
+import {GodLike, LevelResults, RunData} from "./game/components";
 import {world_global} from "./global/create_world";
 import {sleep} from "./animations/helpers";
+import {deck} from "./routes/deck";
 
 
 const level = {
@@ -88,6 +88,8 @@ const map_preview = {
 }
 
 
+
+
 const menu = {
     content: `
     <div class="wrap centered">
@@ -99,6 +101,9 @@ const menu = {
         document.querySelector('.play').addEventListener('click', async () => {
             await init_route(run_manager)
         })
+        document.querySelector('.deck').addEventListener('click', async () => {
+            await init_route(deck)
+        })
     }
 }
 
@@ -107,5 +112,6 @@ export default {
     menu,
     run_manager,
     run_ender,
-    map_preview
+    map_preview,
+    deck
 }

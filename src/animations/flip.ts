@@ -149,7 +149,7 @@ export const update_card = (card, in_hand=false) => {
     value.textContent = ent ? ent.get(Value) : ''
 }
 
-export const flip_card = (card, in_hand=false) => {
+export const flip_card = (card, in_hand=false, custom_update= undefined) => {
 
     anime.set(card, {
         translateX: 0,
@@ -172,7 +172,11 @@ export const flip_card = (card, in_hand=false) => {
     })
 
     show_right_edge(card).finished.then(() => {
-        update_card(card, in_hand)
+        if (custom_update)
+            custom_update()
+        else
+            update_card(card, in_hand)
+
         prepare_for_rotate(card)
         setTimeout(
             () => rotate_edge_right(card),

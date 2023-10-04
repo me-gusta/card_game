@@ -1,4 +1,4 @@
-import {C_Enum, C_Immutable, C_Object, C_Tag, C_Variable} from "../esc/component";
+import {C_Enum, C_Immutable, C_Object, C_Tag} from "../esc/component";
 
 
 export class GodLike extends C_Tag {
@@ -90,3 +90,17 @@ export class OnSwapDisabled extends C_Tag {}
 export class OnTurnEnd extends C_Tag {}
 export class OnTurnStart extends C_Tag {}
 export class OnCardAttacked extends C_Tag {}
+
+export class RunData extends C_Object<any> {
+}
+
+export class GeneratorData extends C_Object<any> {
+}
+
+export class LevelData extends C_Object<any> {
+}
+
+export class LevelResults extends C_Object<any> {
+}
+
+export class SpellLib extends C_Tag {}

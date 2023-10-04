@@ -7,7 +7,7 @@ import {
     InHand,
     InLootPile,
     IsChosen,
-    IsFaded,
+    IsFaded, LevelData, LevelResults,
     LootId,
     OnBoard,
     OnCardAttacked,
@@ -26,7 +26,6 @@ import {from_v, to_v, v} from "../game/local_math";
 import {weapons_map} from "../game/behaviours/weapons";
 import {anim_use_card} from "../animations/interactions";
 import {extract, world_global} from "../global/create_world";
-import {LevelData, LevelResults} from "../global/components";
 import {init_route} from "../routing";
 import routes from "../routes";
 
@@ -251,8 +250,8 @@ const card_event = (elem) => {
         })
     }
 }
-const create_card = (cfg: { i, ent? }) => {
-    const {i, ent} = cfg
+export const create_card = (cfg: { i, ent?, no_events? }) => {
+    const {i, ent, no_events} = cfg
 
     const location = (i).toString().includes('hand') ? 'card-hand' : 'card-board'
 
@@ -266,9 +265,11 @@ const create_card = (cfg: { i, ent? }) => {
 
     const card = new_element(`<div class="card ${location}" id="card-${i}"></div>`)
 
-    card.ontouchend = touch_end(card, card_event(card))
-    card.ontouchstart = touch_start(card)
-    card.ontouchmove = touch_move(card)
+    if (!no_events) {
+        card.ontouchend = touch_end(card, card_event(card))
+        card.ontouchstart = touch_start(card)
+        card.ontouchmove = touch_move(card)
+    }
 
     const side = new_element(`<div class="card-side"></div>`, {
         'clip-path': 'polygon(0% 82.5%, 0% 17.5%, 100% 0%, 100% 100%)',

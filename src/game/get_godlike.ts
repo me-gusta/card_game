@@ -1,6 +1,5 @@
 import {world} from "./create_world";
-import {GodLike, PlayerData, RoundData} from "./components";
-import {RunData} from "../global/components";
+import {GodLike, PlayerData, RoundData, RunData} from "./components";
 import {world_global} from "../global/create_world";
 
 const godlike = () => {

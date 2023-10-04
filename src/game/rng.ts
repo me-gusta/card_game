@@ -1,11 +1,10 @@
 import {getRandomInt, randomEnum} from "./helpers";
-import {E_CardType} from "./components";
+import {E_CardType, GeneratorData} from "./components";
 import {mobs_map} from "./behaviours/mobs";
 import {weapons_map} from "./behaviours/weapons";
 import {food_map} from "./behaviours/food";
 import get_godlike from "./get_godlike";
 import {world_global} from "../global/create_world";
-import {GeneratorData} from "../global/components";
 
 const card_data = () => {
     let type
