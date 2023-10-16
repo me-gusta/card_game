@@ -111,7 +111,11 @@ export const deck = {
                 current_spell = 0
             else
                 current_spell++
-            flip_card(card, false, () => set_spell(card, spells[current_spell]))
+            flip_card(card, {
+                in_hand: false,
+                custom_update: () => set_spell(card, spells[current_spell]),
+                direction: 'down'
+            })
         }
         q('.prev').onclick = () => {
             unset_choosing()
@@ -119,7 +123,11 @@ export const deck = {
                 current_spell = spells.length - 1
             else
                 current_spell--
-            flip_card(card, false, () => set_spell(card, spells[current_spell]))
+            flip_card(card, {
+                in_hand: false,
+                custom_update: () => set_spell(card, spells[current_spell]),
+                direction: 'up'
+            })
         }
 
         q('.use').onclick = () => {

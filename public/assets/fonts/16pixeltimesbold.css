@@ -1,0 +1,9 @@
+@font-face {
+	font-family: '16PixelTimesBold';
+	src: url('../fonts/16pixeltimesbold.eot'); /* IE 9 Compatibility Mode */
+	src: url('../fonts/16pixeltimesbold.eot?#iefix') format('embedded-opentype'), /* IE < 9 */
+		url('../fonts/16pixeltimesbold.woff2') format('woff2'), /* Super Modern Browsers */
+		url('../fonts/16pixeltimesbold.woff') format('woff'), /* Firefox >= 3.6, any other modern browser */
+		url('../fonts/16pixeltimesbold.ttf') format('truetype'), /* Safari, Android, iOS */
+		url('../fonts/16pixeltimesbold.svg#16pixeltimesbold') format('svg'); /* Chrome < 4, Legacy iOS */
+}

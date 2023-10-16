@@ -29,6 +29,9 @@ import {extract, world_global} from "../global/create_world";
 import {init_route} from "../routing";
 import routes from "../routes";
 
+const cards_amount = 12 - 3
+const max_card_y = cards_amount / 3 - 1
+
 const anim_toggle_card = (i) => {
     const ent = world.qo(new InHand(i))
     const card = document.querySelector('#card-hand' + i)
@@ -114,8 +117,30 @@ const anim_swipe = (keyA, keyB) => {
     const elemA = document.querySelector(`#card-${keyA}`)
     const elemB = document.querySelector(`#card-${keyB}`)
 
-    flip_card(elemA)
-    flip_card(elemB)
+    const v_a = to_v(keyA)
+    const v_b = to_v(keyB)
+    const diff = v_a.copy().sub(v_b)
+    console.log('flip', keyA, keyB)
+    console.log('flip', v_a, v_b)
+    console.log('flip', diff)
+
+    let direction
+    if (diff.x === -1) {
+        direction = 'left'
+    } else if (diff.x === 1) {
+        direction = 'right'
+    } else if (diff.y === -1) {
+        direction = 'up'
+    } else if (diff.y === 1) {
+        direction = 'down'
+    }
+
+    flip_card(elemA, {
+        direction
+    })
+    flip_card(elemB, {
+        direction
+    })
 }
 const check_dead = () => {
     for (let ent of world.q(Value, OnBoard)) {
@@ -323,7 +348,7 @@ const create_board = () => {
 
     const board = document.querySelector('.board')
 
-    for (let i = 11; i >= 0; i--) {
+    for (let i = cards_amount - 1; i >= 0; i--) {
         board.appendChild(
             create_card({
                 i: i,
@@ -393,9 +418,10 @@ const start_turn = async () => {
 
 }
 const flip_all = async () => {
-    const numbers = shuffleArray([...range(0, 12)])
+    const numbers = shuffleArray([...range(0, cards_amount)])
     for (let i of numbers) {
         const card = document.querySelector('#card-' + i)
+        console.log('#card-' + i, card)
         flip_card(card)
         // await sleep(50)
     }
@@ -423,10 +449,11 @@ const move_deck = async () => {
         translateY: '112%',
         duration: 500,
         complete: () => {
-            for (let y = 0; y < 4; y++) {
+            for (let y = 0; y < (cards_amount / 3); y++) {
                 for (let x = 0; x < 3; x++) {
+                    console.log(x, y)
                     const elem = document.querySelector('#card-' + from_v([x, y]))
-                    if (y === 3) {
+                    if (y === max_card_y) {
                         anime.set(elem, {
                             translateY: '-130%',
                             opacity: 1,
@@ -453,8 +480,8 @@ const move_deck = async () => {
             }
 
             for (let x = 0; x < 3; x++) {
-                actions.add_new_on_board(v(x, 3))
-                const elem = document.querySelector('#card-' + from_v([x, 3]))
+                actions.add_new_on_board(v(x, max_card_y))
+                const elem = document.querySelector('#card-' + from_v([x, max_card_y]))
                 update_card(elem)
                 anime({
                     targets: elem,
@@ -486,7 +513,7 @@ const end_turn = async () => {
     actions.ensure_active_item()
     actions.ensure_faded()
 
-    await sleep(500)
+    await sleep(1000)
 
     if (!await check_if_finished())
         await start_turn()

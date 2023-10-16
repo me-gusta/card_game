@@ -4,10 +4,27 @@
   box-sizing: border-box;
 }
 
-$theme1: #492d16;
-$theme4: #7c481f;
-$theme2: #bd8051;
-$theme3: #eea671;
+@font-face {
+  font-family: 'pixel';
+  src: url('../fonts/PixeloidMono-d94EV.ttf') format('truetype')
+}
+
+@font-face {
+  font-family: 'pixel-type';
+  src: url('../fonts/pixel_font/MinecraftTenfontcyrillic.eot');
+  src: url('../fonts/pixel_font/MinecraftTenfontcyrillic.eot?#iefix') format('embedded-opentype'),
+  url('../fonts/pixel_font/MinecraftTenfontcyrillic.woff2') format('woff2'),
+  url('../fonts/pixel_font/MinecraftTenfontcyrillic.woff') format('woff'),
+  url('../fonts/pixel_font/MinecraftTenfontcyrillic.ttf') format('truetype');
+}
+
+
+$theme1: #594b40;
+$theme4: #756355;
+$theme2: #7a824a;
+$theme3: #7a824a;
+$theme5: #DCE1C3;
+$text: #DCE1C3;
 
 body {
   margin: 0;
@@ -66,6 +83,7 @@ img {
 .card-wrap {
   position: relative;
   display: flex;
+  aspect-ratio: 1;
   //transition: 0.1s all ease-in;
 
   &.active {
@@ -77,11 +95,13 @@ img {
   /*background: #7e4d27;*/
   display: flex;
   justify-content: start;
-  height: 85px;
+  //height: 85px;
   font-size: 40px;
   position: relative;
   width: 100%;
   z-index: 3;
+  font-family: 'pixel', sans-serif;
+  color: $theme5;
 
   &-side {
     width: 10%;
@@ -110,7 +130,8 @@ img {
     /*height: 100%;*/
     background-image: url("../images/textures/brick.png");
     /*background-repeat: no-repeat;*/
-    background-size: 64px;
+    background-size: cover;
+    //background-size: 64px;
     /*background-position: center center;*/
     /*position: absolute;*/
     /*top: 18%;*/
@@ -136,7 +157,7 @@ img {
     position: absolute;
     bottom: 5%;
     right: 5%;
-    font-size: 20px;
+    font-size: 24px;
   }
 }
 
@@ -173,7 +194,7 @@ img {
 
 
 .next-turn {
-  background: #bd8051;
+  background: $theme3;
   width: 48px;
   height: 100%;
   color: $theme1;
@@ -228,4 +249,83 @@ img {
 .in-use .card {
   width: 85px!important;
   height: 85px!important;
+}
+
+.bg {
+  background-size: 64px;
+  image-rendering: pixelated;
+}
+
+.bg-dungeon {
+  background-image: url("../images/textures/gravel.png");
+}
+.bg-sea {
+  background-image: url("../images/textures/sea.png");
+}
+.bg-hell {
+  background-image: url("../images/textures/hell.png");
+}
+
+.map {
+  font-family: 'pixel-type', sans-serif;
+
+  .header-dungeon {
+    background-image: url("../images/map_preview/leaves.png");
+    color: $text;
+  }
+  .header-sea {
+    background-image: url("../images/map_preview/sea_header.png");
+    color: #b7dcdf;
+  }
+  .header-hell {
+    background-image: url("../images/map_preview/hell_header.png");
+    color: #e77373;
+  }
+
+  .sep-dungeon {
+    background-image: url("../images/map_preview/grass.png");
+  }
+  .sep-sea {
+    background-image: url("../images/map_preview/sea_sep.png");
+  }
+  .sep-hell {
+    background-image: url("../images/map_preview/hell_sep.png");
+  }
+
+  .header {
+    width: 100%;
+    height: 15%;
+    background-size: 64px;
+    image-rendering: pixelated;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+
+    position: relative;
+
+    .title {
+      font-size: 28px;
+    }
+
+
+    .sep {
+      width: 200%;
+      height: 31px;
+      image-rendering: pixelated;
+      position: absolute;
+      &-top {
+        top: -10px;
+        transform: scaleY(-1);
+      }
+
+      &-bot {
+        bottom: -10px;
+      }
+    }
+  }
+
+
 }

@@ -25,7 +25,7 @@ import {update_card} from "../animations/flip";
 import anime from "animejs/lib/anime.es.js";
 
 const init_board = () => {
-    for (let y = 0; y < 4; y++) {
+    for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
             const card_n = from_v(v(x, y))
             const card = world.qo(

@@ -4,13 +4,14 @@ import {get_run_data, get_segment, init_run, print_segments} from "./routes/run_
 import {world} from "./game/create_world";
 import {GodLike, LevelResults, RunData} from "./game/components";
 import {world_global} from "./global/create_world";
-import {sleep} from "./animations/helpers";
+import {q, sleep} from "./animations/helpers";
 import {deck} from "./routes/deck";
+import anime from "animejs/lib/anime.es";
 
 
 const level = {
     content: `
-        <div class="wrap">
+        <div class="wrap bg bg-dungeon">
             <div class="board"></div>
 
 
@@ -41,7 +42,7 @@ const run_manager = {
         if (run_data === undefined) {
             world_global.qo(GodLike).add(
                 new RunData({
-                    current_level: 38,
+                    current_level: 1,
                     hp: 20,
                     hp_max: 20
                 })
@@ -73,17 +74,56 @@ const run_ender = {
     }
 }
 const map_preview = {
-    content: `<div class="wrap centered">
-    <div class="lvl" style="font-size: 120px;"></div>
-</div>`,
+    content: `<div class="wrap map bg">
+    <div class="header">
+        <div class="sep sep-top"></div>
+        <div class="title"></div>
+        <div class="lvl"></div>
+        <div class="sep sep-bot"></div>
+    </div>
+    
+    
+        </div>`,
     init: async () => {
-        const run_data = world_global.qo(GodLike).get(RunData)
-        document.querySelector('.lvl').textContent = String(run_data.current_level - 1)
+        // const run_data = world_global.qo(GodLike).get(RunData)
+        const lvl = 3// run_data.current_level
+
+        // set stylings
+        let styling = 'hell'
+        // let styling = 'sea'
+        // let styling = 'dungeon'
+
+        q('.bg').classList.add(`bg-${styling}`)
+        q('.header').classList.add(`header-${styling}`)
+        q('.sep-top').classList.add(`sep-${styling}`)
+        q('.sep-bot').classList.add(`sep-${styling}`)
+
+        // q('.title').textContent = 'Сумрачный Лес'
+        // q('.title').textContent = 'Мертвое Море'
+        q('.title').textContent = 'Царство Тьмы'
+
+
+        anime({
+            targets: '.sep-top',
+            easing: 'linear',
+            duration: 2000,
+            translateX: -50
+        })
+        anime({
+            targets: '.sep-bot',
+            easing: 'linear',
+            duration: 2000,
+            translateX: 50
+        })
+
+        document.querySelector('.lvl').textContent = String(lvl - 1)
         await sleep(1000)
 
-        document.querySelector('.lvl').textContent = String(run_data.current_level)
+        document.querySelector('.lvl').textContent = String(lvl)
         await sleep(1000)
         // await init_route(run_manager)
+
+
     }
 }
 
