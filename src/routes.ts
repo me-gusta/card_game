@@ -89,18 +89,18 @@ const map_preview = {
         const lvl = 3// run_data.current_level
 
         // set stylings
-        let styling = 'hell'
+        // let styling = 'hell'
         // let styling = 'sea'
-        // let styling = 'dungeon'
+        let styling = 'dungeon'
 
         q('.bg').classList.add(`bg-${styling}`)
         q('.header').classList.add(`header-${styling}`)
         q('.sep-top').classList.add(`sep-${styling}`)
         q('.sep-bot').classList.add(`sep-${styling}`)
 
-        // q('.title').textContent = 'Сумрачный Лес'
+        q('.title').textContent = 'Сумрачный Лес'
         // q('.title').textContent = 'Мертвое Море'
-        q('.title').textContent = 'Царство Тьмы'
+        // q('.title').textContent = 'Царство Тьмы'
 
 
         anime({
@@ -147,11 +147,70 @@ const menu = {
     }
 }
 
+
+const box_opener = {
+    content: `
+    <div class="wrap centered box-opener">
+        <div class="wrap ground bg bg-dungeon"></div>
+        <div class="salut"></div>
+            
+            <div class="box">
+                <div class="sprite box-back"></div>
+                <div class="sprite box-front"></div>
+            </div>
+    </div>
+    `,
+    init: async () => {
+
+        anime.set('.bg', {
+            perspective: 80,
+            rotateX: 30,
+        })
+
+        const move = 7
+        const diff = 10
+        anime.set('.box-front', {
+            skew: '5deg, 0deg',
+            translateX: -move
+        })
+
+        anime.timeline({
+            targets: '.box-front',
+            easing: 'linear',
+            duration: 1200,
+            direction: 'alternate',
+            loop: true
+        }).add({
+            skew: '-5deg, 0deg',
+            translateX: move
+        })
+
+
+        anime.set('.box-back', {
+            translateX: -move
+        })
+
+        anime.timeline({
+            targets: '.box-back',
+            easing: 'linear',
+            duration: 1200,
+            direction: 'alternate',
+            loop: true
+        }).add({
+            translateX: move,
+        })
+
+
+    }
+}
+
+
 export default {
     level,
     menu,
     run_manager,
     run_ender,
     map_preview,
-    deck
+    deck,
+    box_opener
 }

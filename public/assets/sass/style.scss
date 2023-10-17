@@ -316,6 +316,8 @@ img {
       height: 31px;
       image-rendering: pixelated;
       position: absolute;
+      background-size: contain;
+
       &-top {
         top: -10px;
         transform: scaleY(-1);
@@ -326,6 +328,52 @@ img {
       }
     }
   }
-
-
 }
+
+.box-opener {
+  position: relative;
+  .salut {
+    background-image: url("../images/map_preview/salut.gif");
+    background-size: cover;
+    image-rendering: pixelated;
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    top: 30px;
+    left: 30px;
+  }
+  .box {
+    position: relative;
+    width: 220px;
+    height: 140px;
+
+    .sprite {
+      background-size: cover;
+      image-rendering: pixelated;
+      position: absolute;
+    }
+
+    &-front {
+      background-image: url("../images/map_preview/chest.png");
+      z-index: 2;
+      width: 220px;
+      height: 140px;
+    }
+
+    &-back {
+      background-image: url("../images/map_preview/chest_back.gif");
+      z-index: 3;
+      width: 125px;
+      height: 125px;
+      bottom: 5px;
+      left: 43px;
+      opacity: 0.8;
+    }
+
+  }
+
+  .ground {
+    position: absolute;
+  }
+}
+
