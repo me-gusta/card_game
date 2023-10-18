@@ -235,8 +235,13 @@ img {
   background-image: url("../images/textures/hell.png");
 }
 
+.bg-wall {
+  background-image: url("../images/map_preview/leaves.png");
+}
+
 .map {
   font-family: "pixel-type", sans-serif;
+  position: relative;
 }
 .map .header-dungeon {
   background-image: url("../images/map_preview/leaves.png");
@@ -288,9 +293,80 @@ img {
 .map .header .sep-bot {
   bottom: -10px;
 }
+.map .m1 {
+  width: 64px;
+  height: 64px;
+  position: relative;
+}
+.map .markers {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  gap: 30px;
+  width: 100%;
+  align-items: center;
+}
+.map .marker {
+  image-rendering: pixelated;
+}
+.map .marker-skull {
+  width: 64px;
+  height: 64px;
+  background-size: 64px;
+  background-image: url("../images/map_preview/skull.png");
+}
+.map .marker-chest {
+  width: 100px;
+  height: 64px;
+  background-size: cover;
+  background-image: url("../images/map_preview/chest.png");
+}
+
+@keyframes Animation {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 110% 0;
+  }
+}
+.bg-rainbow {
+  animation: Animation 5s linear infinite;
+  position: absolute;
+  background: linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 154, 0) 10%, rgb(208, 222, 33) 20%, rgb(79, 220, 74) 30%, rgb(63, 218, 216) 40%, rgb(47, 201, 226) 50%, rgb(28, 127, 238) 60%, rgb(95, 21, 242) 70%, rgb(186, 12, 248) 80%, rgb(251, 7, 217) 90%, rgb(255, 0, 0) 100%);
+  background-size: 1000% 100%;
+  transform: skewX(20deg) scaleX(3);
+}
 
 .box-opener {
   position: relative;
+  image-rendering: pixelated;
+}
+.box-opener .ground {
+  position: absolute;
+  z-index: 1;
+  bottom: -160px;
+  border-radius: 200px;
+  box-shadow: -22px 0px 14px -1px rgba(0, 0, 0, 0.1) inset, 22px 0px 14px -1px rgba(219, 190, 187, 0.15) inset;
+}
+.box-opener .spiral {
+  background-size: cover;
+  image-rendering: pixelated;
+  position: absolute;
+}
+.box-opener .spiral-1 {
+  background-image: url("../images/map_preview/spiral1.gif");
+  width: 1025px;
+  height: 1025px;
+  opacity: 0.3;
+}
+.box-opener .spiral-2 {
+  background-image: url("../images/map_preview/spiral2.gif");
+  width: 412px;
+  height: 412px;
+  opacity: 0.9;
+  transform: scaleX(-1);
 }
 .box-opener .salut {
   background-image: url("../images/map_preview/salut.gif");
@@ -299,8 +375,27 @@ img {
   position: absolute;
   width: 46px;
   height: 46px;
-  top: 30px;
-  left: 30px;
+  opacity: 0.8;
+}
+.box-opener .salut-1 {
+  top: 30%;
+  left: 45%;
+}
+.box-opener .salut-2 {
+  top: 33%;
+  right: 24%;
+}
+.box-opener .salut-3 {
+  top: 39%;
+  right: 10%;
+}
+.box-opener .salut-4 {
+  top: 33%;
+  left: 24%;
+}
+.box-opener .salut-5 {
+  top: 39%;
+  left: 10%;
 }
 .box-opener .box {
   position: relative;
@@ -317,18 +412,6 @@ img {
   z-index: 2;
   width: 220px;
   height: 140px;
-}
-.box-opener .box-back {
-  background-image: url("../images/map_preview/chest_back.gif");
-  z-index: 3;
-  width: 125px;
-  height: 125px;
-  bottom: 5px;
-  left: 43px;
-  opacity: 0.8;
-}
-.box-opener .ground {
-  position: absolute;
 }
 
 /*# sourceMappingURL=style.css.map */

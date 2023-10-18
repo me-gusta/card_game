@@ -151,20 +151,40 @@ const menu = {
 const box_opener = {
     content: `
     <div class="wrap centered box-opener">
+        <div class="wrap bg bg-rainbow"></div>
+        <div class="spiral spiral-1"></div>
+        <div class="spiral spiral-2"></div>
         <div class="wrap ground bg bg-dungeon"></div>
-        <div class="salut"></div>
+        <div class="salut salut-1"></div>
+        <div class="salut salut-2"></div>
+        <div class="salut salut-3"></div>
+        <div class="salut salut-4"></div>
+        <div class="salut salut-5"></div>
             
             <div class="box">
-                <div class="sprite box-back"></div>
                 <div class="sprite box-front"></div>
             </div>
     </div>
     `,
     init: async () => {
 
-        anime.set('.bg', {
+        anime.set('.bg-dungeon', {
             perspective: 80,
-            rotateX: 30,
+            rotateX: 20,
+        })
+
+        anime.set('.bg-wall-1', {
+            rotateY: 20,
+            translateX: '-50%'
+        })
+
+
+        anime({
+            target: '.box-opener',
+            easing: 'linear',
+            duration: 1200,
+            'background-position':'100% 0%',
+            loop: true
         })
 
         const move = 7
