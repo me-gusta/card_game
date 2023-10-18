@@ -374,7 +374,7 @@ img {
 }
 
 .bg-rainbow {
-  animation: Animation 5s linear infinite;
+  animation: Animation 10s linear infinite;
   position: absolute;
   background: linear-gradient(
                   90deg,
@@ -437,6 +437,10 @@ img {
     height: 46px;
     opacity: 0.8;
 
+    &-hide {
+      opacity: 0;
+    }
+
     &-1 {
       top: 30%;
       left: 45%;
@@ -465,6 +469,7 @@ img {
     position: relative;
     width: 220px;
     height: 140px;
+    z-index: 3;
 
     .sprite {
       background-size: cover;
@@ -480,6 +485,17 @@ img {
     }
 
 
+
+  }
+
+  .explosion {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background-image: url("../images/map_preview/explosion.gif");
+    image-rendering: pixelated;
+    background-size: cover;
+    z-index: 10;
 
   }
 

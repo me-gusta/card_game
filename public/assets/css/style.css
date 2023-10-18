@@ -332,7 +332,7 @@ img {
   }
 }
 .bg-rainbow {
-  animation: Animation 5s linear infinite;
+  animation: Animation 10s linear infinite;
   position: absolute;
   background: linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 154, 0) 10%, rgb(208, 222, 33) 20%, rgb(79, 220, 74) 30%, rgb(63, 218, 216) 40%, rgb(47, 201, 226) 50%, rgb(28, 127, 238) 60%, rgb(95, 21, 242) 70%, rgb(186, 12, 248) 80%, rgb(251, 7, 217) 90%, rgb(255, 0, 0) 100%);
   background-size: 1000% 100%;
@@ -377,6 +377,9 @@ img {
   height: 46px;
   opacity: 0.8;
 }
+.box-opener .salut-hide {
+  opacity: 0;
+}
 .box-opener .salut-1 {
   top: 30%;
   left: 45%;
@@ -401,6 +404,7 @@ img {
   position: relative;
   width: 220px;
   height: 140px;
+  z-index: 3;
 }
 .box-opener .box .sprite {
   background-size: cover;
@@ -412,6 +416,15 @@ img {
   z-index: 2;
   width: 220px;
   height: 140px;
+}
+.box-opener .explosion {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background-image: url("../images/map_preview/explosion.gif");
+  image-rendering: pixelated;
+  background-size: cover;
+  z-index: 10;
 }
 
 /*# sourceMappingURL=style.css.map */

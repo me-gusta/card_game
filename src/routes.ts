@@ -4,7 +4,7 @@ import {get_run_data, get_segment, init_run, print_segments} from "./routes/run_
 import {world} from "./game/create_world";
 import {GodLike, LevelResults, RunData} from "./game/components";
 import {world_global} from "./global/create_world";
-import {q, sleep} from "./animations/helpers";
+import {new_element, q, sleep} from "./animations/helpers";
 import {deck} from "./routes/deck";
 import anime from "animejs/lib/anime.es";
 
@@ -151,19 +151,22 @@ const menu = {
 const box_opener = {
     content: `
     <div class="wrap centered box-opener">
+        <div><img src="assets/images/map_preview/chest_open.png"/> </div>
         <div class="wrap bg bg-rainbow"></div>
         <div class="spiral spiral-1"></div>
         <div class="spiral spiral-2"></div>
         <div class="wrap ground bg bg-dungeon"></div>
         <div class="salut salut-1"></div>
-        <div class="salut salut-2"></div>
-        <div class="salut salut-3"></div>
-        <div class="salut salut-4"></div>
-        <div class="salut salut-5"></div>
+        <div class="salut salut-2 salut-hide"></div>
+        <div class="salut salut-3 salut-hide"></div>
+        <div class="salut salut-4 salut-hide"></div>
+        <div class="salut salut-5 salut-hide"></div>
             
             <div class="box">
                 <div class="sprite box-front"></div>
             </div>
+            
+        
     </div>
     `,
     init: async () => {
@@ -194,7 +197,7 @@ const box_opener = {
             translateX: -move
         })
 
-        anime.timeline({
+        const tl = anime.timeline({
             targets: '.box-front',
             easing: 'linear',
             duration: 1200,
@@ -206,20 +209,20 @@ const box_opener = {
         })
 
 
-        anime.set('.box-back', {
-            translateX: -move
-        })
+        q('.box').addEventListener('click', async () => {
+            tl.pause()
+            anime.set('.box-front', {
+                'background-image': 'url("assets/images/map_preview/chest_open.png")',
+                skew: '0deg, 0deg',
+                translateX: 0
+            })
+            anime({
+                targets: '.salut-hide',
+                opacity: 0.8
+            })
 
-        anime.timeline({
-            targets: '.box-back',
-            easing: 'linear',
-            duration: 1200,
-            direction: 'alternate',
-            loop: true
-        }).add({
-            translateX: move,
+            q('.box-opener').appendChild(new_element('<div class="explosion"></div>'))
         })
-
 
     }
 }
