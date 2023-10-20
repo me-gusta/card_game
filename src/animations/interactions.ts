@@ -12,7 +12,7 @@ export const anim_bounce_card = (card) => {
         scaleY: 0.9,
 
         easing: 'easeOutQuint',
-        duration: 10,
+        duration: 50,
         keyframes: [
             {rotate: 3},
             {rotate: -3},
@@ -27,7 +27,7 @@ export const anim_bounce_card = (card) => {
             scaleX: 1,
             scaleY: 1,
             easing: 'easeInQuint',
-            duration: 200
+            duration: 160
         }
     )
 }

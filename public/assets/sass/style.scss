@@ -32,6 +32,8 @@ $theme5: #DCE1C3;
 $text: #DCE1C3;
 $menuBtn: #d6e1c8;
 
+$header_color: #f1f6f0;
+
 body {
   margin: 0;
   background: $theme1;
@@ -77,6 +79,72 @@ img {
   align-items: center;
 }
 
+$header_height: 43px;
+
+.level {
+  .header {
+    //position: absolute;
+    top: 0;
+    width: 100%;
+    height: $header_height;
+    image-rendering: pixelated;
+    background-image:  url("../images/textures/planks.png");
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    //padding: 0 20px;
+    font-family: "pixel", sans-serif;
+    color: $header_color;
+
+    .group-coins {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      height: 100%;
+    }
+
+    .bth-header {
+      height: 100%;
+      width: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon {
+      image-rendering: pixelated;
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+
+      &-help {
+        width: 16px;
+        height: 18px;
+        background-image: url("../images/level/help.png");
+      }
+
+      &-coins {
+        width: 20px;
+        height: 20px;
+        background-image: url("../images/level/coins.png");
+      }
+
+      &-settings {
+        width: 20px;
+        height: 22px;
+        background-image: url("../images/level/settings.png");
+      }
+    }
+  }
+
+}
+
 .board {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -113,7 +181,7 @@ img {
     width: 10%;
     height: 100%;
     /*background-image: url("../images/textures/gold.png");*/
-    background: $theme2;
+    background: #9c7a4b;
   }
 
   &-body {
@@ -161,8 +229,8 @@ img {
 
   &-value {
     position: absolute;
-    bottom: 5%;
-    right: 5%;
+    bottom: 9%;
+    right: 9%;
     font-family: "pixel", sans-serif;
     font-size: 24px;
 
@@ -175,18 +243,51 @@ img {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
   padding: 0 20px;
-  background: $theme4;
+  //background: $theme4;
+  background-image:  url("../images/textures/planks.png");
+  image-rendering: pixelated;
+  box-shadow:  4px 4px 8px 12px rgba(30, 30, 30, 0.3);
+  font-family: "pixel", sans-serif;
+  color: $header_color;
+  font-size: 16px;
+
+  .group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+  }
 
   &-hp {
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    &-icon {
+      image-rendering: pixelated;
+      background-image: url("../images/level/heart.png");
+      width: 24px;
+      height: 24px;
+      background-position: center center;
+      background-size: contain;
+    }
+  }
+
+  .bg-portrait {
+    width: 64px;
+    height: 64px;
+    background-size: cover;
+    image-rendering: pixelated;
+    background-image: url("../images/level/bg_portrait.png");
+    padding: 7px;
+    transform: scaleX(-1);
   }
 
   &-portrait {
-    width: 48px;
-    height: 48px;
-    background: url("../images/portraits/man.png");
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/portraits/Icons_01.png");
     background-size: cover;
     image-rendering: pixelated;
   }
@@ -201,13 +302,20 @@ img {
 
 
 .next-turn {
-  background: $theme3;
-  width: 48px;
+  width: 64px;
   height: 100%;
   color: $theme1;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  image-rendering: pixelated;
+  background-image: url("../images/level/btn.png");
+  background-position: center center;
+  background-size: 48px;
+  background-repeat: no-repeat;
+
+
 }
 
 .btn {
@@ -263,7 +371,7 @@ img {
   image-rendering: pixelated;
 
   &-dungeon {
-    background-image: url("../images/textures/gravel.png");
+    background-image: url("../images/textures/dungeon.png");
   }
   &-sea {
     background-image: url("../images/textures/sea.png");
@@ -345,10 +453,9 @@ img {
     background-size: contain;
   }
 
-  .play {
+  .play-area {
     z-index: 2;
     position: absolute;
-    border: 1px solid rebeccapurple;
     width: 60%;
     height: 40%;
     top: 30%;

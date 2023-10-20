@@ -11,20 +11,47 @@ import anime from "animejs/lib/anime.es";
 
 const level = {
     content: `
-        <div class="wrap bg bg-dungeon">
+        <div class="wrap level bg bg-dungeon">
+            <div class="header">
+                <div class="group">
+                    <div class="bth-header">
+                        <div class="icon icon-help"></div>
+                    </div>
+                </div>
+                <div class="group">
+                    <div class="group-coins">
+                        <div class="coins">
+                            15
+                        </div>
+                        <div class="icon icon-coins"></div>
+                    </div>
+                    <div class="bth-header">
+                        <div class="icon icon-settings"></div>
+                    </div>
+                </div>
+            </div>
             <div class="board"></div>
 
 
             <div class="statistics">
-                <div class="statistics-hp">
-                    <span class="hp">20</span> /
-                    <span class="hp-max">20</span>
+                <div class="group">
+                    <div class="bg-portrait">
+                        <div class="statistics-portrait"></div>
+                    </div>
+                    
+                    <div class="statistics-hp">
+                        <div class="statistics-hp-text">
+                            <span class="hp">20</span>/<span class="hp-max">20</span>
+                        </div>
+                        <div class="statistics-hp-icon">
+                            
+                        </div>
+                    </div>
                 </div>
-                <div class="statistics-portrait">
-
-                </div>
+                
+                
                 <div class="next-turn">
-                    вперед
+                    <div class="next-turn-icon"></div>
                 </div>
             </div>
             <div class="hand"></div>
@@ -141,7 +168,7 @@ const menu = {
             <div class="arrow-up"></div>
         </div>
         
-        <div class="play"></div>
+        <div class="play-area"></div>
 
         <div class="btns">
             <div class="btn-flat deck">
@@ -173,7 +200,7 @@ const menu = {
             direction: 'alternate',
         })
 
-        document.querySelector('.play').addEventListener('click', async () => {
+        document.querySelector('.play-area').addEventListener('click', async () => {
             await init_route(run_manager)
         })
         document.querySelector('.deck').addEventListener('click', async () => {
