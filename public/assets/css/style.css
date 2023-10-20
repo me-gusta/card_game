@@ -6,7 +6,10 @@
 
 @font-face {
   font-family: "pixel";
-  src: url("../fonts/PixeloidMono-d94EV.ttf") format("truetype");
+  src: url("../fonts/pixel/PixeloidMono.woff2") format("woff2"), url("../fonts/pixel/PixeloidMono.woff") format("woff"), url("../fonts/pixel/PixeloidMono.svg#PixeloidMono") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 @font-face {
   font-family: "pixel-type";
@@ -132,7 +135,9 @@ img {
   position: absolute;
   bottom: 5%;
   right: 5%;
+  font-family: "pixel", sans-serif;
   font-size: 24px;
+  image-rendering: pixelated;
 }
 
 .statistics {
@@ -222,21 +227,114 @@ img {
   background-size: 64px;
   image-rendering: pixelated;
 }
-
 .bg-dungeon {
   background-image: url("../images/textures/gravel.png");
 }
-
 .bg-sea {
   background-image: url("../images/textures/sea.png");
 }
-
 .bg-hell {
   background-image: url("../images/textures/hell.png");
 }
-
 .bg-wall {
   background-image: url("../images/map_preview/leaves.png");
+}
+.bg-box-opener {
+  background-image: url("../images/box_opener/bg.png");
+}
+.bg-menu {
+  background-image: url("../images/menu/bg.png");
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.menu .backgrounds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+.menu .backgrounds .bg {
+  position: absolute;
+  left: 0;
+}
+.menu .backgrounds .bg-menu {
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.menu .backgrounds .bg-color-1 {
+  top: 0;
+  width: 100%;
+  height: 50%;
+  background: #3f443d;
+}
+.menu .backgrounds .bg-color-2 {
+  bottom: 0;
+  width: 100%;
+  height: 50%;
+  background: #1b1b21;
+}
+.menu .eyes {
+  position: absolute;
+  top: 50%;
+  left: 42%;
+  width: 40px;
+  height: 20px;
+  image-rendering: pixelated;
+  background: url("../images/menu/eyes.gif") no-repeat;
+  background-size: contain;
+}
+.menu .arrow-up {
+  position: absolute;
+  top: 60%;
+  left: 43%;
+  image-rendering: pixelated;
+  width: 58px;
+  height: 58px;
+  background: url("../images/menu/arrow_up.png") no-repeat;
+  background-size: contain;
+}
+.menu .play {
+  z-index: 2;
+  position: absolute;
+  border: 1px solid rebeccapurple;
+  width: 60%;
+  height: 40%;
+  top: 30%;
+  margin: auto;
+}
+.menu .btns {
+  z-index: 2;
+  position: absolute;
+  bottom: 10%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.menu .btn-flat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "pixel", sans-serif;
+  color: #d6e1c8;
+}
+.menu .icon {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.menu .icon.spellbook {
+  background-image: url("../images/menu/spellbook.png");
+}
+.menu .icon.wardrobe {
+  background-image: url("../images/menu/wardrobe.png");
 }
 
 .map {
@@ -244,7 +342,7 @@ img {
   position: relative;
 }
 .map .header-dungeon {
-  background-image: url("../images/map_preview/leaves.png");
+  background-image: url("../images/map_preview/dungeon_header.png");
   color: #DCE1C3;
 }
 .map .header-sea {
@@ -287,11 +385,11 @@ img {
   background-size: contain;
 }
 .map .header .sep-top {
-  top: -10px;
+  top: -15px;
   transform: scaleY(-1);
 }
 .map .header .sep-bot {
-  bottom: -10px;
+  bottom: -15px;
 }
 .map .m1 {
   width: 64px;
@@ -328,15 +426,15 @@ img {
     background-position: 0 0;
   }
   100% {
-    background-position: 110% 0;
+    background-position: 100% 0;
   }
 }
 .bg-rainbow {
-  animation: Animation 10s linear infinite;
+  opacity: 0.9;
   position: absolute;
-  background: linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 154, 0) 10%, rgb(208, 222, 33) 20%, rgb(79, 220, 74) 30%, rgb(63, 218, 216) 40%, rgb(47, 201, 226) 50%, rgb(28, 127, 238) 60%, rgb(95, 21, 242) 70%, rgb(186, 12, 248) 80%, rgb(251, 7, 217) 90%, rgb(255, 0, 0) 100%);
-  background-size: 1000% 100%;
-  transform: skewX(20deg) scaleX(3);
+  background: url("../images/box_opener/flow.png"), linear-gradient(90deg, rgba(215, 27, 53, 0.7) 0%, rgb(230, 184, 49) 30%, rgba(215, 27, 53, 0.7) 100%);
+  background-size: 150% 100%;
+  background-blend-mode: overlay;
 }
 
 .box-opener {
@@ -356,20 +454,20 @@ img {
   position: absolute;
 }
 .box-opener .spiral-1 {
-  background-image: url("../images/map_preview/spiral1.gif");
+  background-image: url("../images/box_opener/spiral1.gif");
   width: 1025px;
   height: 1025px;
-  opacity: 0.3;
+  opacity: 0.1;
 }
 .box-opener .spiral-2 {
-  background-image: url("../images/map_preview/spiral2.gif");
+  background-image: url("../images/box_opener/spiral2.gif");
   width: 412px;
   height: 412px;
-  opacity: 0.9;
+  opacity: 0.6;
   transform: scaleX(-1);
 }
 .box-opener .salut {
-  background-image: url("../images/map_preview/salut.gif");
+  background-image: url("../images/box_opener/salut.gif");
   background-size: cover;
   image-rendering: pixelated;
   position: absolute;
@@ -381,23 +479,23 @@ img {
   opacity: 0;
 }
 .box-opener .salut-1 {
-  top: 30%;
+  top: 20%;
   left: 45%;
 }
 .box-opener .salut-2 {
-  top: 33%;
+  top: 23%;
   right: 24%;
 }
 .box-opener .salut-3 {
-  top: 39%;
+  top: 29%;
   right: 10%;
 }
 .box-opener .salut-4 {
-  top: 33%;
+  top: 23%;
   left: 24%;
 }
 .box-opener .salut-5 {
-  top: 39%;
+  top: 29%;
   left: 10%;
 }
 .box-opener .box {
@@ -421,7 +519,6 @@ img {
   position: absolute;
   width: 500px;
   height: 500px;
-  background-image: url("../images/map_preview/explosion.gif");
   image-rendering: pixelated;
   background-size: cover;
   z-index: 10;

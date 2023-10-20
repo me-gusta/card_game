@@ -132,12 +132,47 @@ const map_preview = {
 
 const menu = {
     content: `
-    <div class="wrap centered">
-        <div class="btn play">Play</div> 
-        <div class="btn deck">Deck</div>
+    <div class="wrap centered menu">
+        <div class="backgrounds">
+            <div class="wrap bg bg-color-1"></div>
+            <div class="wrap bg bg-color-2"></div>
+            <div class="wrap bg bg-menu"></div>
+            <div class="eyes"></div>
+            <div class="arrow-up"></div>
+        </div>
+        
+        <div class="play"></div>
+
+        <div class="btns">
+            <div class="btn-flat deck">
+                <div class="icon spellbook"></div>
+                Spells
+            </div>
+            <div class="btn-flat deck">
+                <div class="icon wardrobe"></div>
+                Wardrobe
+            </div>
+        </div>
     </div>
     `,
     init: async () => {
+        anime({
+            targets: '.arrow-up',
+            duration: 500,
+            easing: 'easeOutQuint',
+            translateY: -20,
+            loop: true,
+            direction: 'alternate',
+        })
+        anime({
+            targets: '.icon',
+            duration: 400,
+            easing: 'linear',
+            translateY: 5,
+            loop: true,
+            direction: 'alternate',
+        })
+
         document.querySelector('.play').addEventListener('click', async () => {
             await init_route(run_manager)
         })
@@ -150,8 +185,8 @@ const menu = {
 
 const box_opener = {
     content: `
-    <div class="wrap centered box-opener">
-        <div><img src="assets/images/map_preview/chest_open.png"/> </div>
+    <div class="wrap centered box-opener bg bg-box-opener">
+        <div><img src="assets/images/map_preview/chest_open.png"/>  </div>
         <div class="wrap bg bg-rainbow"></div>
         <div class="spiral spiral-1"></div>
         <div class="spiral spiral-2"></div>
@@ -208,9 +243,23 @@ const box_opener = {
             translateX: move
         })
 
+        const rainbow = anime({
+            targets: '.bg-rainbow',
+            easing: 'linear',
+            duration: 300000,
+            'background-position': '10000%',
+        })
+
 
         q('.box').addEventListener('click', async () => {
             tl.pause()
+            rainbow.pause()
+            anime({
+                targets: '.spiral-1',
+                easing: 'linear',
+                duration: 1000,
+                opacity: 0.0,
+            })
             anime.set('.box-front', {
                 'background-image': 'url("assets/images/map_preview/chest_open.png")',
                 skew: '0deg, 0deg',
@@ -221,7 +270,15 @@ const box_opener = {
                 opacity: 0.8
             })
 
-            q('.box-opener').appendChild(new_element('<div class="explosion"></div>'))
+            q('.box-opener').appendChild(new_element('<div class="explosion"></div>',{
+                'background-image': `url("assets/images/box_opener/explosion.gif")`,
+            }))
+
+            console.log(anime.get('.bg-rainbow', 'background-position'))
+
+            // anime.set('.bg-rainbow', {
+            //     animation: 'none',
+            // })
         })
 
     }

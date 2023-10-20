@@ -6,7 +6,12 @@
 
 @font-face {
   font-family: 'pixel';
-  src: url('../fonts/PixeloidMono-d94EV.ttf') format('truetype')
+  src: url('../fonts/pixel/PixeloidMono.woff2') format('woff2'),
+  url('../fonts/pixel/PixeloidMono.woff') format('woff'),
+  url('../fonts/pixel/PixeloidMono.svg#PixeloidMono') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -25,6 +30,7 @@ $theme2: #7a824a;
 $theme3: #7a824a;
 $theme5: #DCE1C3;
 $text: #DCE1C3;
+$menuBtn: #d6e1c8;
 
 body {
   margin: 0;
@@ -157,11 +163,12 @@ img {
     position: absolute;
     bottom: 5%;
     right: 5%;
+    font-family: "pixel", sans-serif;
     font-size: 24px;
+
+    image-rendering: pixelated;;
   }
 }
-
-
 
 
 .statistics {
@@ -254,20 +261,133 @@ img {
 .bg {
   background-size: 64px;
   image-rendering: pixelated;
+
+  &-dungeon {
+    background-image: url("../images/textures/gravel.png");
+  }
+  &-sea {
+    background-image: url("../images/textures/sea.png");
+  }
+  &-hell {
+    background-image: url("../images/textures/hell.png");
+  }
+
+  &-wall {
+    background-image: url("../images/map_preview/leaves.png");
+  }
+
+  &-box-opener {
+    background-image: url("../images/box_opener/bg.png");
+  }
+
+  &-menu {
+    background-image: url("../images/menu/bg.png");
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
 }
 
-.bg-dungeon {
-  background-image: url("../images/textures/gravel.png");
-}
-.bg-sea {
-  background-image: url("../images/textures/sea.png");
-}
-.bg-hell {
-  background-image: url("../images/textures/hell.png");
-}
+.menu {
+  .backgrounds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    .bg {
+      position: absolute;
+      left: 0;
 
-.bg-wall {
-  background-image: url("../images/map_preview/leaves.png");
+      &-menu {
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      &-color-1 {
+        top: 0;
+        width: 100%;
+        height: 50%;
+        background: #3f443d;
+      }
+
+      &-color-2 {
+        bottom: 0;
+        width: 100%;
+        height: 50%;
+        background: #1b1b21;
+      }
+    }
+
+  }
+
+  .eyes {
+    position: absolute;
+    top: 50%;
+    left: 42%;
+    width: 40px;
+    height: 20px;
+    image-rendering: pixelated;
+    background: url("../images/menu/eyes.gif") no-repeat;
+    background-size: contain;
+  }
+
+  .arrow-up {
+    position: absolute;
+    top: 60%;
+    left: 43%;
+    image-rendering: pixelated;
+    width: 58px;
+    height: 58px;
+    background: url("../images/menu/arrow_up.png") no-repeat;
+    background-size: contain;
+  }
+
+  .play {
+    z-index: 2;
+    position: absolute;
+    border: 1px solid rebeccapurple;
+    width: 60%;
+    height: 40%;
+    top: 30%;
+    margin: auto;
+  }
+
+  .btns {
+    z-index: 2;
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+
+  .btn-flat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: "pixel", sans-serif;
+    color: $menuBtn;
+
+  }
+
+  .icon {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
+    background-size: contain;
+    background-repeat:  no-repeat;
+
+    &.spellbook {
+      background-image: url("../images/menu/spellbook.png");
+    }
+    &.wardrobe {
+      background-image: url("../images/menu/wardrobe.png");
+    }
+  }
 }
 
 .map {
@@ -275,7 +395,7 @@ img {
   position: relative;
 
   .header-dungeon {
-    background-image: url("../images/map_preview/leaves.png");
+    background-image: url("../images/map_preview/dungeon_header.png");
     color: $text;
   }
   .header-sea {
@@ -324,12 +444,12 @@ img {
       background-size: contain;
 
       &-top {
-        top: -10px;
+        top: -15px;
         transform: scaleY(-1);
       }
 
       &-bot {
-        bottom: -10px;
+        bottom: -15px;
       }
     }
   }
@@ -370,28 +490,18 @@ img {
 
 @keyframes Animation {
   0%{background-position: 0 0}
-  100%{background-position: 110% 0}
+  100%{background-position: 100% 0}
 }
 
+
+
 .bg-rainbow {
-  animation: Animation 10s linear infinite;
+  //animation: Animation 10s linear infinite;
+  opacity: 0.9;
   position: absolute;
-  background: linear-gradient(
-                  90deg,
-                  rgba(255, 0, 0, 1) 0%,
-                  rgba(255, 154, 0, 1) 10%,
-                  rgba(208, 222, 33, 1) 20%,
-                  rgba(79, 220, 74, 1) 30%,
-                  rgba(63, 218, 216, 1) 40%,
-                  rgba(47, 201, 226, 1) 50%,
-                  rgba(28, 127, 238, 1) 60%,
-                  rgba(95, 21, 242, 1) 70%,
-                  rgba(186, 12, 248, 1) 80%,
-                  rgba(251, 7, 217, 1) 90%,
-                  rgba(255, 0, 0, 1) 100%
-  );
-  background-size: 1000% 100%;
-  transform: skewX(20deg) scaleX(3);
+  background: url("../images/box_opener/flow.png"), linear-gradient(90deg, rgba(215, 27, 53, 0.7) 0%, rgb(230, 184, 49) 30%, rgba(215, 27, 53, 0.7) 100%);
+  background-size: 150% 100%;
+  background-blend-mode: overlay;
 }
 
 .box-opener {
@@ -413,23 +523,23 @@ img {
     image-rendering: pixelated;
     position: absolute;
     &-1 {
-      background-image: url("../images/map_preview/spiral1.gif");
+      background-image: url("../images/box_opener/spiral1.gif");
       width: 1025px;
       height: 1025px;
-      opacity: 0.3;
+      opacity: 0.1;
     }
 
     &-2 {
-      background-image: url("../images/map_preview/spiral2.gif");
+      background-image: url("../images/box_opener/spiral2.gif");
       width: 412px;
       height: 412px;
-      opacity: 0.9;
+      opacity: 0.6;
       transform: scaleX(-1);
     }
   }
 
   .salut {
-    background-image: url("../images/map_preview/salut.gif");
+    background-image: url("../images/box_opener/salut.gif");
     background-size: cover;
     image-rendering: pixelated;
     position: absolute;
@@ -442,26 +552,26 @@ img {
     }
 
     &-1 {
-      top: 30%;
+      top: 20%;
       left: 45%;
     }
 
     &-2 {
-      top: 33%;
+      top: 23%;
       right: 24%;
     }
 
     &-3 {
-      top: 39%;
+      top: 29%;
       right: 10%;
     }
 
     &-4 {
-      top: 33%;
+      top: 23%;
       left: 24%;
     }
     &-5 {
-      top: 39%;
+      top: 29%;
       left: 10%;
     }
   }
@@ -484,15 +594,12 @@ img {
       height: 140px;
     }
 
-
-
   }
 
   .explosion {
     position: absolute;
     width: 500px;
     height: 500px;
-    background-image: url("../images/map_preview/explosion.gif");
     image-rendering: pixelated;
     background-size: cover;
     z-index: 10;
