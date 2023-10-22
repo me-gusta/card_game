@@ -371,7 +371,7 @@ const create_hand = () => {
 }
 
 const check_if_finished = async () => {
-    // if (world.q(OnBoard).length > 0) return
+    if (world.q(OnBoard).length > 0) return
 
     const player_data = get_godlike.player_data()
 

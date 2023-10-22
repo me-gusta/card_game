@@ -7,6 +7,7 @@ import {world_global} from "./global/create_world";
 import {new_element, q, sleep} from "./animations/helpers";
 import {deck} from "./routes/deck";
 import anime from "animejs/lib/anime.es";
+import {lib_mobs} from "./global/libs";
 
 
 const level = {
@@ -14,7 +15,7 @@ const level = {
         <div class="wrap level bg bg-dungeon">
             <div class="header">
                 <div class="group">
-                    <div class="bth-header">
+                    <div class="btn-header">
                         <div class="icon icon-help"></div>
                     </div>
                 </div>
@@ -25,7 +26,7 @@ const level = {
                         </div>
                         <div class="icon icon-coins"></div>
                     </div>
-                    <div class="bth-header">
+                    <div class="btn-header settings">
                         <div class="icon icon-settings"></div>
                     </div>
                 </div>
@@ -58,7 +59,14 @@ const level = {
 
 
         </div>`,
-    init: async () => run_level().then()
+    init: async () => {
+
+        q('.settings').addEventListener('click', () => {
+            init_route(menu)
+        })
+
+        run_level().then()
+    }
 }
 
 const run_manager = {
@@ -180,6 +188,10 @@ const menu = {
                 Wardrobe
             </div>
         </div>
+        
+        <div class="dev-btns">
+            <button class="dev-btn">меню разработчика</button>        
+        </div>
     </div>
     `,
     init: async () => {
@@ -200,12 +212,18 @@ const menu = {
             direction: 'alternate',
         })
 
-        document.querySelector('.play-area').addEventListener('click', async () => {
+        q('.play-area').addEventListener('click', async () => {
             await init_route(run_manager)
         })
-        document.querySelector('.deck').addEventListener('click', async () => {
+        q('.deck').addEventListener('click', async () => {
             await init_route(deck)
         })
+        q('.dev-btn').addEventListener('click', async () => {
+            console.log(dev)
+            await init_route(dev)
+        })
+
+
     }
 }
 
@@ -312,6 +330,74 @@ const box_opener = {
 }
 
 
+const dev = {
+    content: `
+    <div class="wrap dev">
+        <div class="row">
+            <label for="is-on">Включить режим разработчика</label>
+            <input type="checkbox" id="is-on" /> 
+        </div>
+        <div class="row">
+            Локация
+            <select class="location">
+              <option value="dungeon">Сумрачный Лес</option>
+              <option value="sea">Река Безысходности</option>
+              <option value="hell">Царство Тьмы</option>
+            </select>
+        </div>
+        <div class="row">
+            <label for="is-gen">Включить настройку генерации карт</label>
+            <input type="checkbox" id="is-gen" /> 
+        </div>
+        <div class="row">
+            Монстры
+        </div>
+        <div class="row">
+            Обычный 1
+            <select class="mobs">
+            </select>
+        </div>
+        <div class="row">
+            Обычный 2
+            <select class="mobs">
+            </select>
+        </div>
+        <div class="row">
+            Редкий 1
+            <select class="mobs">
+            </select>
+        </div>
+        <div class="row">
+            Редкий 2
+            <select class="mobs">
+            </select>
+        </div>
+        
+        <div class="row">
+            <button class="save">Сохранить</button> 
+            <button class="exit">Выйти</button> 
+        </div>
+        
+    </div>
+    `,
+    init: async () => {
+        const elem_mobs = document.querySelectorAll('.mobs')
+
+        for (let name of Object.keys(lib_mobs)) {
+            for (let elem of elem_mobs)
+                elem.appendChild(new_element(
+                    `<option value="${name}">${name}</option>`
+                ))
+        }
+
+        q('.exit').addEventListener('click', () => {
+            init_route(menu)
+        })
+    }
+}
+
+
+
 export default {
     level,
     menu,
@@ -319,5 +405,6 @@ export default {
     run_ender,
     map_preview,
     deck,
-    box_opener
+    box_opener,
+    dev
 }

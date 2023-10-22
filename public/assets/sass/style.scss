@@ -109,7 +109,7 @@ $header_height: 43px;
       height: 100%;
     }
 
-    .bth-header {
+    .btn-header {
       height: 100%;
       width: 40px;
       display: flex;
@@ -161,7 +161,7 @@ $header_height: 43px;
   //transition: 0.1s all ease-in;
 
   &.active {
-    background: $theme3;
+    background: rgba(77, 217, 47, 0.5);
   }
 }
 
@@ -181,7 +181,7 @@ $header_height: 43px;
     width: 10%;
     height: 100%;
     /*background-image: url("../images/textures/gold.png");*/
-    background: #9c7a4b;
+    background: #885b47;
   }
 
   &-body {
@@ -312,7 +312,6 @@ $header_height: 43px;
   image-rendering: pixelated;
   background-image: url("../images/level/btn.png");
   background-position: center center;
-  background-size: 48px;
   background-repeat: no-repeat;
 
 
@@ -397,6 +396,15 @@ $header_height: 43px;
 }
 
 .menu {
+
+  .dev-btns {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 30px;
+    z-index: 3;
+  }
+
   .backgrounds {
     position: absolute;
     top: 0;
@@ -715,3 +723,9 @@ $header_height: 43px;
 
 }
 
+.dev {
+  .row {
+    display: flex;
+    gap: 15px;
+  }
+}
