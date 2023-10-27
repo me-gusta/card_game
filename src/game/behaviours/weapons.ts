@@ -4,7 +4,8 @@ import {
     pattern_around,
     pattern_chess,
     pattern_closest,
-    pattern_col, pattern_farthest,
+    pattern_col,
+    pattern_farthest,
     pattern_row,
     relative,
     select
@@ -15,9 +16,8 @@ import create from "../create";
 import filters from "../filters";
 import {half_or_kill} from "./util";
 import get_godlike from "../get_godlike";
-import {anim_bounce_card} from "../../animations/interactions";
+import {anim_deal_damage} from "../../animations/interactions";
 import actions from "../actions";
-import {i18n} from "../../localization";
 
 const calc_damage = (actor, target) => {
 
@@ -29,13 +29,6 @@ const calc_damage = (actor, target) => {
     } else {
         return value
     }
-}
-
-const anim_deal_damage = (ent) => {
-    const key = ent.get(OnBoard)
-    const card = document.querySelector('#card-' + key)
-    anim_bounce_card(card)
-    card.querySelector('.card-value').textContent = ent.get(Value)
 }
 
 export const weapons_map = new Map([

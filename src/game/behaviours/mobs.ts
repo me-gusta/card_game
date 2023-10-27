@@ -23,10 +23,12 @@ import {getRandomChoice, in_array} from "../helpers";
 import {pattern_around, relative} from "../local_math";
 import create from "../create";
 import {half_or_kill} from "./util";
+import {lib_mobs} from "../../global/libs";
+import {anim_deal_damage} from "../../animations/interactions";
 
 
 export const mobs_map = new Map([
-    ['spider', {
+    [lib_mobs.spider, {
         value_range: [2, 5]
     }],
     ['imp', {
@@ -35,7 +37,7 @@ export const mobs_map = new Map([
     ['moose', {
         value_range: [1, 1]
     }],
-    ['rat', {
+    [lib_mobs.rat, {
         value_range: [3, 7],
         on_consume: (actor: Entity) => {
             const value = actor.get(Value)
@@ -46,7 +48,7 @@ export const mobs_map = new Map([
                 godlike.add(new EffectPoisoned(value))
         }
     }],
-    ['gorilla', {
+    [lib_mobs.cyclops, {
         value_range: [3, 7],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
@@ -55,35 +57,39 @@ export const mobs_map = new Map([
 
             half_or_kill(actor)
             other.modify(Value).set(0)
+            anim_deal_damage(actor)
         }
     }],
-    ['pharaoh', {
+    [lib_mobs.hound, {
         value_range: [3, 7],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
             half_or_kill(other)
             actor.add(OnSwapDisabled)
+            anim_deal_damage(other)
         }
     }],
-    ['dwarf', {
+    [lib_mobs.gorgon, {
         value_range: [3, 7],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
-            if (other.get(CardType) !== E_CardType.coin)
+            if (other.get(CardType) !== E_CardType.weapon)
                 return
-            const dmg = Math.floor(other.get(Value) / 2) || 1
-            actor.modify(Value).sub(dmg)
-            other.modify(Value).set(0)
+            half_or_kill(actor)
+            half_or_kill(other)
+            anim_deal_damage(actor)
+            anim_deal_damage(other)
         }
     }],
-    ['phoenix', {
+    [lib_mobs.zombie, {
         value_range: [3, 7],
         triggers: [OnTurnEnd],
         on_turn_end: (actor: Entity) => {
             half_or_kill(actor)
+            anim_deal_damage(actor)
         }
     }],
-    ['elf', {
+    [lib_mobs.ghost, {
         value_range: [3, 7],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
@@ -104,10 +110,10 @@ export const mobs_map = new Map([
             actor.add(new OnBoard(key_random))
         }
     }],
-    ['worm', {
+    [lib_mobs.worm, {
         value_range: [3, 7],
-        triggers: [OnTurnStart],
-        on_turn_start: (actor: Entity) => {
+        triggers: [OnTurnEnd],
+        on_turn_end: (actor: Entity) => {
             relative(actor, [], pattern_around).forEach(ent => {
                 if (ent.get(CardType) !== E_CardType.food)
                     return
