@@ -1,28 +1,18 @@
 import {World} from "../esc/world";
-import {CardType, CardVariant, E_CardType, GodLike, SpellLib} from "../game/components";
+import {CardType, CardVariant, DevData, E_CardType, GodLike, SpellLib} from "../game/components";
+import {lib_spells} from "./libs";
 
 const create_world_global = () => {
     const world = new World()
-    world.createEntity(new GodLike())
+    const god_like = world.createEntity(new GodLike())
 
-    const spells = [
-        'doubler',
-        'make_moose',
-        'luxury_dinner',
-        'liquidate',
-        'recruit',
-        'disinfect',
-        'harvest',
-        'calm_down',
-        'grenade',
-        'imperfection',
-        'blood_donation',
-        'grocery',
-        'master_key',
-        'elementary',
-    ]
+    const dev_data = JSON.parse(localStorage.getItem('dev_data')) || {}
+    console.log(dev_data)
 
-    for (let spell of spells) {
+    god_like.add(new DevData(dev_data))
+
+
+    for (let spell of Object.keys(lib_spells)) {
         world.createEntity(
             new CardType(E_CardType.weapon),
             new CardVariant(spell),
@@ -44,4 +34,10 @@ export const purge = (component) => {
 
 export const extract = (component) => {
     return world_global.qo(component).get(component)
+}
+
+
+export const set_single = (component) => {
+    purge(typeof component)
+    return world_global.qo(GodLike).add(component)
 }

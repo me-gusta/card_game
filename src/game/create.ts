@@ -2,7 +2,7 @@ import {world} from "./create_world";
 import {
     CardType,
     CardVariant,
-    Crate,
+    Crate, DevData,
     E_CardType,
     Enemy,
     GodLike,
@@ -22,6 +22,7 @@ import {weapons_map} from "./behaviours/weapons";
 import {mobs_map} from "./behaviours/mobs";
 import {food_map} from "./behaviours/food";
 import get_godlike from "./get_godlike";
+import {extract} from "../global/create_world";
 
 
 const mob = (variant, key, position_component=OnBoard) => {
@@ -163,6 +164,11 @@ const upcoming = (data) => {
 }
 
 const hand = () => {
+    const dd = extract(DevData)
+    let weapon = 'sword'
+    if (dd) {
+        weapon = dd.weapon
+    }
     world.createEntity(
         new InHand(0),
         new Value(5),
@@ -185,8 +191,8 @@ const godlike = (run_data) => {
             hp_max: run_data.player.hp_max,
             hp: run_data.player.hp,
             coins: 0,
-            swipe_points: 2,
-            swipe_points_max: 2
+            swipe_points: 0,
+            swipe_points_max: 3
         })
     )
 }

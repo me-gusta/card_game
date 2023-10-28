@@ -205,24 +205,38 @@ img {
   color: #f1f6f0;
   font-size: 16px;
 }
+.statistics-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .statistics .group {
   display: flex;
   align-items: center;
   gap: 5px;
   height: 100%;
 }
-.statistics-hp {
+.statistics-group {
   display: flex;
-  align-items: center;
-  gap: 2px;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  gap: 5px;
 }
-.statistics-hp-icon {
+.statistics .icon {
   image-rendering: pixelated;
-  background-image: url("../images/level/heart.png");
-  width: 24px;
-  height: 24px;
   background-position: center center;
   background-size: contain;
+}
+.statistics-power .icon {
+  background-image: url("../images/level/energy.png");
+  width: 24px;
+  height: 24px;
+}
+.statistics-hp .icon {
+  width: 24px;
+  height: 24px;
+  background-image: url("../images/level/heart.png");
 }
 .statistics .bg-portrait {
   width: 64px;

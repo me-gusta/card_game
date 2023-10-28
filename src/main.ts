@@ -12,4 +12,4 @@ const dev_settings = {
     chosen_monsters: []
 }
 
-window.onload = async () => await init_route(routes.menu)
+window.onload = async () => await init_route(routes.run_manager)

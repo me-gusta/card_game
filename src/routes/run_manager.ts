@@ -1,10 +1,11 @@
 import {getRandomChoice, round} from "../game/helpers";
-import {purge, world_global} from "../global/create_world";
-import {GeneratorData, GodLike, LevelData, RunData} from "../game/components";
+import {extract, purge, world_global} from "../global/create_world";
+import {DevData, GeneratorData, GodLike, LevelData, RunData} from "../game/components";
 import {one_v2} from "../game/rng";
 import {show_debug_data} from "../debug";
 import {init_route} from "../routing";
 import routes from "../routes";
+import {lib_mobs, lib_themes} from "../global/libs";
 
 
 const test_gen_one = () => {
@@ -88,6 +89,12 @@ const segments = [
     {
         region: [1, 1],
         exp: [-3, -3],
+        theme: lib_themes.dungeon,
+        mobs_basic: [
+            lib_mobs.spider,
+            lib_mobs.bat,
+            lib_mobs.frog
+        ],
         mobs: {
             common: ['spider'],
             rare: ['rat']
@@ -100,6 +107,12 @@ const segments = [
     {
         region: [2, 15],
         exp: [-3, 0.27],
+        theme: lib_themes.dungeon,
+        mobs_basic: [
+            lib_mobs.spider,
+            lib_mobs.bat,
+            lib_mobs.frog
+        ],
         mobs: {
             common: ['pharaoh', 'phoenix'],
             rare: ['rat', 'worm'],
@@ -114,6 +127,12 @@ const segments = [
     {
         region: [16, 35],
         exp: [0.27, 2],
+        theme: lib_themes.sea,
+        mobs_basic: [
+            lib_mobs.snake,
+            lib_mobs.vulture,
+            lib_mobs.skeleton
+        ],
         mobs: {
             common: ['gorilla', 'dwarf', 'worm', 'rat', 'pharaoh'],
             rare: ['elf', 'orc', 'phoenix'],
@@ -128,13 +147,19 @@ const segments = [
     {
         region: [36, 65],
         exp: [2.1, 2.5],
+        theme: lib_themes.sea,
+        mobs_basic: [
+            lib_mobs.snake,
+            lib_mobs.vulture,
+            lib_mobs.skeleton
+        ],
         mobs: {
             common: ['gorilla', 'dwarf', 'worm', 'rat', 'pharaoh'],
             rare: ['elf', 'orc', 'phoenix', 'golem'],
             legend: ['lych', 'necromancer']
         },
         weapons: {
-            common: ['sword',  'mace', 'shuriken'],
+            common: ['sword', 'mace', 'shuriken'],
             rare: ['dagger', 'crowbar', 'nunchaku'],
             legend: ['knuckles', 'katana']
         }
@@ -142,13 +167,19 @@ const segments = [
     {
         region: [66, 90],
         exp: [2.4, 3],
+        theme: lib_themes.hell,
+        mobs_basic: [
+            lib_mobs.imp,
+            lib_mobs.martyr,
+            lib_mobs.headless
+        ],
         mobs: {
             common: ['golem', 'dwarf', 'worm', 'rat', 'phoenix'],
-            rare: ['elf', 'orc', 'pharaoh',  'gorilla', 'dragon'],
+            rare: ['elf', 'orc', 'pharaoh', 'gorilla', 'dragon'],
             legend: ['lych', 'necromancer']
         },
         weapons: {
-            common: ['whip',  'mace', 'dagger'],
+            common: ['whip', 'mace', 'dagger'],
             rare: ['shuriken', 'shovel', 'spear', 'crowbar'],
             legend: ['knuckles', 'rake']
         }
@@ -156,13 +187,19 @@ const segments = [
     {
         region: [91, 100],
         exp: [3, 3.3],
+        theme: lib_themes.hell,
+        mobs_basic: [
+            lib_mobs.imp,
+            lib_mobs.martyr,
+            lib_mobs.headless
+        ],
         mobs: {
             common: ['golem', 'dwarf', 'worm', 'pharaoh', 'lych'],
             rare: ['devil', 'orc', 'pharaoh', 'rat', 'golem'],
             legend: ['necromancer', 'dragon']
         },
         weapons: {
-            common: ['whip',  'mace', 'spear'],
+            common: ['whip', 'mace', 'spear'],
             rare: ['shuriken', 'shovel', 'dagger', 'crowbar', 'katana'],
             legend: ['knuckles', 'rake']
         }
@@ -173,7 +210,7 @@ export const print_segments = () => {
     for (let segment of segments) {
         const func = get_exp_function(segment)
         const {region} = segment
-        for (let i = region[0]; i <= region[1]; i ++) {
+        for (let i = region[0]; i <= region[1]; i++) {
             console.log(i, func(i))
         }
     }
@@ -217,39 +254,66 @@ const generate_probabilities_mob = (data, basic: string) => {
 const generate_probabilities_weapon = (data, basic: string) => {
     if (data.legend === undefined) {
         return [
-            [20, basic],
+            [35, basic],
             [30, getRandomChoice(data.common)],
-            [30, getRandomChoice(data.common)],
+            [20, getRandomChoice(data.common)],
             [10, getRandomChoice(data.rare)],
-            [10, getRandomChoice(data.rare)],
+            [5, getRandomChoice(data.rare)],
         ]
     }
 
     const legend = getRandomChoice(data.legend)
     return [
-        [20, basic],
+        [34, basic],
         [30, getRandomChoice(data.common)],
-        [30, getRandomChoice(data.common)],
+        [20, getRandomChoice(data.common)],
         [10, getRandomChoice(data.rare)],
-        [9, getRandomChoice(data.rare)],
+        [5, getRandomChoice(data.rare)],
         [1, legend]
+    ]
+}
+
+const get_prob_mobs_dev = () => {
+    const dd = extract(DevData)
+
+    return [
+        [50, dd.common_1],
+        [30, dd.common_2],
+        [20, dd.rare]
     ]
 }
 
 const generate_cards = (current_level) => {
     const segment = get_segment(current_level)
     const exp_function = get_exp_function(segment)
-    const {mobs, weapons} = segment
+    const {mobs, weapons, mobs_basic} = segment
 
-    const  level_probabilities = new Map([
-        ['mob', generate_probabilities_mob(mobs, 'spider')],
+    const dd = extract(DevData)
+
+    let prob_mobs
+    let prob_weapons
+    if (dd && dd.is_gen) {
+        prob_mobs = get_prob_mobs_dev()
+        prob_weapons = [
+            [100, dd.weapon],
+        ]
+    } else {
+        prob_mobs = generate_probabilities_mob(mobs, getRandomChoice(mobs_basic))
+        prob_weapons = generate_probabilities_weapon(weapons, 'sword')
+    }
+
+
+    console.log(mobs)
+
+
+    const level_probabilities = new Map([
+        ['mob', prob_mobs],
         ['food', [
             [80, 'apple'],
             [20, 'omlet'],
         ]],
-        ['weapon', generate_probabilities_weapon(weapons, 'sword')]
+        ['weapon', prob_weapons]
     ])
-    console.log(exp_function(current_level))
 
     purge(GeneratorData)
     world_global.qo(GodLike).add(
@@ -261,6 +325,13 @@ const generate_cards = (current_level) => {
     return test_gen()
 }
 
+const get_theme = (current_level) => {
+    const dd = extract(DevData)
+    console.log(dd)
+    if (dd.is_on) {
+        return dd.theme
+    } else return 'dungeon'
+}
 
 
 export const init_run = async () => {
@@ -279,11 +350,10 @@ export const init_run = async () => {
         new LevelData({
             cards,
             player: {
-                hp: run_data.hp,//Math.round( * exp_function(current_level)),
-                hp_max: run_data.hp_max//Math.round( * exp_function(current_level)),
-            }
+                hp: run_data.hp,
+                hp_max: run_data.hp_max
+            },
+            theme: get_theme(current_level)
         }))
-
-
 
 }

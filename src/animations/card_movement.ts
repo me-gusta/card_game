@@ -22,7 +22,7 @@ export const touch_start = (elem) => {
 }
 
 export const touch_end = (elem, callback) => {
-    return (e) => {
+    return async (e) => {
         e.preventDefault()
 
         if (offset.length > 38) {
@@ -30,16 +30,16 @@ export const touch_end = (elem, callback) => {
             const angle = offset.angle()
 
             if (quarter <= angle && angle < 3 * quarter) {
-                callback( 'swipe_top')
+                await callback( 'swipe_top')
             } else if (3 * quarter <= angle && angle < 5 * quarter) {
-                callback('swipe_right')
+                await callback('swipe_right')
             } else if (5 * quarter <= angle && angle < 7 * quarter) {
-                callback('swipe_bottom')
+                await callback('swipe_bottom')
             } else {
-                callback('swipe_left')
+                await callback('swipe_left')
             }
         } else if (offset.length <= 0) {
-            callback('click')
+            await callback('click')
         }
         pos_touch_start = null
         offset = Vector.ZERO

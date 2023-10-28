@@ -3,7 +3,7 @@ import {I18n} from "i18n-js";
 export const i18n = new I18n({
     en: {
         doubler: "Double value of any card",
-        make_moose: "Turn card into a moose",
+        make_frog: "Turn card into a moose",
         luxury_dinner: "Transform all food on board into coins",
         liquidate: "Kill 1 random enemy",
         recruit: "Turn enemy into a random weapon",
@@ -21,7 +21,7 @@ export const i18n = new I18n({
     },
     "ru": {
         title_doubler: "Удвоить мощь",
-        title_make_moose: "Зомбировать",
+        title_make_frog: "Зомбировать",
         title_luxury_dinner: "Привал",
         title_liquidate: "Вырвать сердце",
         title_recruit: "Мобо-меч (Мече-моб)",
@@ -36,7 +36,7 @@ export const i18n = new I18n({
         title_elementary: "Элементарно",
 
         doubler: "Удваивает значение любой карты",
-        make_moose: "Превратите карточку в лося",
+        make_frog: "Превратите карточку в лося",
         luxury_dinner: "Превратите всю еду на борту в монеты",
         liquidate: "Убейте 1 случайного врага",
         recruit: "Превратите врага в случайное оружие",

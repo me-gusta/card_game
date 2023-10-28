@@ -100,6 +100,9 @@ export class GeneratorData extends C_Object<any> {
 export class LevelData extends C_Object<any> {
 }
 
+export class DevData extends C_Object<any> {
+}
+
 export class LevelResults extends C_Object<any> {
 }
 

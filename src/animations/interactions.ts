@@ -1,7 +1,6 @@
 import anime from "animejs/lib/anime.es.js";
-import {InHand, OnBoard} from "../game/components";
+import {CardVariant, InHand, OnBoard, Value} from "../game/components";
 import get_godlike from "../game/get_godlike";
-import {flip_card} from "./flip";
 
 
 export const anim_bounce_card = (card) => {
@@ -177,4 +176,9 @@ export const anim_weapon_move = (key) => {
 }
 
 
-
+export const anim_deal_damage = (ent) => {
+    const key = ent.get(OnBoard)
+    const card = document.querySelector('#card-' + key)
+    anim_bounce_card(card)
+    card.querySelector('.card-value').textContent = ent.get(Value)
+}

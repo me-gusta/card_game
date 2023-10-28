@@ -16,8 +16,9 @@ import create from "../create";
 import filters from "../filters";
 import {half_or_kill} from "./util";
 import get_godlike from "../get_godlike";
-import {anim_deal_damage} from "../../animations/interactions";
+import {anim_deal_damage, anim_hero_take_damage} from "../../animations/interactions";
 import actions from "../actions";
+import {lib_spells, lib_weapons} from "../../global/libs";
 
 const calc_damage = (actor, target) => {
 
@@ -32,13 +33,8 @@ const calc_damage = (actor, target) => {
 }
 
 export const weapons_map = new Map([
-    ['sword', {
+    [lib_weapons.sword, {
         value_range: [3, 7],
-        // filters: [
-        //     filters.is_of_type(E_CardType.mob),
-        //     filters.is_of_type(E_CardType.crate),
-        //
-        // ],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
@@ -49,7 +45,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['mace', {
+    [lib_weapons.mace, {
         value_range: [2, 3],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
@@ -62,31 +58,33 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['scythe', {
+    [lib_weapons.scythe, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             relative(target, [], pattern_row).forEach(ent => {
                 ent.modify(Value).sub(dmg)
+                anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
         },
         description: '',
     }],
-    ['whip', {
+    [lib_weapons.whip, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             relative(target, [], pattern_col).forEach(ent => {
                 ent.modify(Value).sub(dmg)
+                anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
         },
         description: '',
     }],
-    ['shuriken', {
+    [lib_weapons.shuriken, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
@@ -97,44 +95,53 @@ export const weapons_map = new Map([
                     target_two = ent
             })
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
             target_two.modify(Value).sub(dmg)
+            anim_deal_damage(target_two)
 
             actor.modify(Value).sub(dmg)
         },
         description: '',
     }],
-    ['shovel', {
+    [lib_weapons.shovel, {
         value_range: [2, 4],
         pattern: pattern_chess,
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
 
             actor.modify(Value).sub(dmg)
         },
         description: '',
     }],
-    ['dagger', {
+    [lib_weapons.dagger, {
         value_range: [2, 4],
         pattern: pattern_closest,
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
 
             actor.modify(Value).sub(dmg)
         },
         description: '',
     }],
-    ['frying_pan', {
+    [lib_weapons.frying_pan, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             const value_target = target.get(Value)
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
 
             if (target.get(Value) <= 0) {
+                if (target.has(LootId)) {
+                    const loot = world.qe(target.get(LootId))
+                    world.killEntity(loot)
+                }
                 const loot = world.createEntity(
                     new InLootPile(),
                     new Value(value_target),
@@ -149,32 +156,35 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['stick', {
+    [lib_weapons.stick, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
 
             actor.modify(Value).set(0)
         },
         description: '',
     }],
-    ['spear', {
+    [lib_weapons.spear, {
         value_range: [2, 4],
         pattern: pattern_farthest,
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
 
             actor.modify(Value).sub(dmg)
         },
         description: '',
     }],
-    ['knuckles', {
+    [lib_weapons.knuckles, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
 
             if (target.get(Value) <= 0) {
                 if (target.has(LootId)) {
@@ -188,7 +198,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['crowbar', {
+    [lib_weapons.crowbar, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
@@ -199,52 +209,56 @@ export const weapons_map = new Map([
                 target.modify(Value).sub(dmg)
                 actor.modify(Value).sub(dmg)
             }
+            anim_deal_damage(target)
 
         },
         description: '',
     }],
-    ['katana', {
+    [lib_weapons.katana, {
         value_range: [2, 4],
         pattern: [[1, 1], [1, 2]],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             select([], [[1, 1], [1, 2]]).forEach(ent => {
-
                 ent.modify(Value).sub(dmg)
+                anim_deal_damage(ent)
             })
             actor.modify(Value).sub(dmg)
 
         },
         description: '',
     }],
-    ['nunchaku', {
+    [lib_weapons.nunchaku, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             target.modify(Value).sub(dmg)
+            anim_deal_damage(target)
             actor.modify(Value).sub(dmg)
             if (getRandomInt(0, 1) === 1) {
                 const player_data = get_godlike.player_data()
                 player_data.hp -= dmg
+                anim_hero_take_damage()
             }
 
         },
         description: '',
     }],
-    ['rake', {
+    [lib_weapons.rake, {
         value_range: [2, 4],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
             if (in_array([E_CardType.food, E_CardType.weapon], target.get(CardType))) {
                 const value_target = target.get(Value)
-                actor.modify(Value).sub(Math.floor(value_target / 2))
+                actor.modify(Value).sub(Math.ceil(value_target / 4))
 
                 actions.consume_card(target.get(OnBoard))
             } else {
                 target.modify(Value).sub(dmg)
                 actor.modify(Value).sub(dmg)
+                anim_deal_damage(target)
             }
 
         },
@@ -252,26 +266,26 @@ export const weapons_map = new Map([
     }],
 
     // spells
-    ['doubler', {
+    [lib_spells.doubler, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             target.modify(Value).mul(2)
             actor.modify(Value).set(0)
         },
     }],
-    ['make_moose', {
+    [lib_spells.make_frog, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             const key = target.get(OnBoard)
             target.remove(OnBoard)
 
-            create.mob('moose', key)
+            create.mob('frog', key)
             actor.modify(Value).set(0)
 
         },
         description: '',
     }],
-    ['luxury_dinner', {
+    [lib_spells.luxury_dinner, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.food)
@@ -293,7 +307,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['liquidate', {
+    [lib_spells.liquidate, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.mob),
@@ -307,7 +321,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['recruit', {
+    [lib_spells.liquidate, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.mob),
@@ -332,7 +346,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['disinfect', {
+    [lib_spells.disinfect, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.mob).and(
@@ -355,7 +369,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['harvest', {
+    [lib_spells.harvest, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             pick_n_random(3, world.q(OnBoard)).forEach(ent => {
@@ -374,7 +388,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['calm_down', {
+    [lib_spells.calm_down, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             world.q(OnBoard, new CardType(E_CardType.mob)).forEach(ent => {
@@ -385,7 +399,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['grenade', {
+    [lib_spells.grenade, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.weapon)
@@ -400,7 +414,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['imperfection', {
+    [lib_spells.imperfection, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             let c = 0
@@ -421,7 +435,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['blood_donation', {
+    [lib_spells.blood_donation, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             const player = get_godlike.player_data()
@@ -436,7 +450,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['grocery', {
+    [lib_spells.grocery, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.coin)
@@ -457,7 +471,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['master_key', {
+    [lib_spells.master_key, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.crate)
@@ -473,7 +487,7 @@ export const weapons_map = new Map([
         },
         description: '',
     }],
-    ['elementary', {
+    [lib_spells.elementary, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.coin),

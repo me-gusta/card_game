@@ -1,13 +1,18 @@
-import {getRandomInt, range, round, shuffleArray} from "../game/helpers";
+import {getRandomInt, in_array, range, shuffleArray} from "../game/helpers";
 import {flip_card, update_card} from "../animations/flip";
 import actions from "../game/actions";
-import {extract_digits, find_image, new_element, sleep} from "../animations/helpers";
+import {extract_digits, img_url, new_element, q, sleep} from "../animations/helpers";
 import {
-    CardVariant, GodLike,
+    CardType,
+    CardVariant,
+    E_CardType,
+    GodLike,
     InHand,
     InLootPile,
     IsChosen,
-    IsFaded, LevelData, LevelResults,
+    IsFaded,
+    LevelData,
+    LevelResults,
     LootId,
     OnBoard,
     OnCardAttacked,
@@ -21,7 +26,6 @@ import anime from "animejs/lib/anime.es";
 import {mobs_map} from "../game/behaviours/mobs";
 import get_godlike from "../game/get_godlike";
 import {touch_end, touch_move, touch_start} from "../animations/card_movement";
-import {one_v2} from "../game/rng";
 import {from_v, to_v, v} from "../game/local_math";
 import {weapons_map} from "../game/behaviours/weapons";
 import {anim_use_card} from "../animations/interactions";
@@ -84,8 +88,8 @@ const choose_card = (card) => {
         ],
         easing: 'easeOutQuad',
     })
-
 }
+
 const get_swipe_direction = (dir_string) => {
     switch (dir_string) {
         case 'top':
@@ -98,21 +102,31 @@ const get_swipe_direction = (dir_string) => {
             return [-1, 0]
     }
 }
+
 const init_on_swap = (cardA, cardB) => {
     if (cardA === undefined || cardB === undefined)
-        return
+        return false
 
     if (cardA.has(OnSwapDisabled))
-        return
+        return false
 
     if (cardA.get(Value) === 0)
-        return
+        return false
 
     if (cardA.get(OnSwap)) {
         const {on_swap} = mobs_map.get(cardA.get(CardVariant))
+        console.log(on_swap.toString(), cardA.get(CardVariant))
         on_swap(cardA, cardB)
+        return true
     }
 }
+
+const make_on_swap = (cardA, cardB) => {
+    const a = init_on_swap(cardA, cardB)
+    const b = init_on_swap(cardB, cardA)
+    return a || b
+}
+
 const anim_swipe = (keyA, keyB) => {
     const elemA = document.querySelector(`#card-${keyA}`)
     const elemB = document.querySelector(`#card-${keyB}`)
@@ -120,9 +134,6 @@ const anim_swipe = (keyA, keyB) => {
     const v_a = to_v(keyA)
     const v_b = to_v(keyB)
     const diff = v_a.copy().sub(v_b)
-    console.log('flip', keyA, keyB)
-    console.log('flip', v_a, v_b)
-    console.log('flip', diff)
 
     let direction
     if (diff.x === -1) {
@@ -142,7 +153,9 @@ const anim_swipe = (keyA, keyB) => {
         direction
     })
 }
+
 const check_dead = () => {
+    let is_someone_dead = false
     for (let ent of world.q(Value, OnBoard)) {
         if (ent.get(Value) > 0) continue
 
@@ -156,6 +169,7 @@ const check_dead = () => {
             coin.add(new OnBoard(key))
         }
         world.killEntity(ent)
+        is_someone_dead = true
 
 
         const card = document.querySelector('#card-' + key)
@@ -169,15 +183,24 @@ const check_dead = () => {
         world.killEntity(ent)
 
         const card = document.querySelector('#card-hand' + key)
+        is_someone_dead = true
         // flip_card(card, true)
     }
+    return is_someone_dead
 }
+
+const anim_swipe_points = () => {
+    const pd = get_godlike.player_data()
+    q('.power').textContent = pd.swipe_points
+}
+
 const set_hand_card_value = (ent) => {
     const card = document.querySelector('#card-hand' + ent.get(InHand)).querySelector('.card-value')
     card.textContent = ent.get(Value)
 }
+
 let can_process = true
-const process_event = (data) => {
+const process_event = async (data) => {
 
     if (!can_process) return;
 
@@ -198,30 +221,45 @@ const process_event = (data) => {
         const dir = get_swipe_direction(action.slice(6))
         const key_other = from_v(pos_this.add(dir))
 
-        const neighbour = world.qo(new OnBoard(key_other))
+        let neighbour = world.qo(new OnBoard(key_other))
 
         if (neighbour === undefined) return
 
         can_process = false
 
-        const card = world.qo(new OnBoard(key))
-        card.remove(OnBoard)
-        neighbour.remove(OnBoard)
+        let card = world.qo(new OnBoard(key))
+        const is_on_swap = make_on_swap(card, neighbour)
 
-        card.add(new OnBoard(key_other))
-        neighbour.add(new OnBoard(key))
+        console.log(is_on_swap)
 
-        anim_swipe(key, key_other)
 
-        init_on_swap(card, neighbour)
-        init_on_swap(neighbour, card)
+        const delay = is_on_swap ? 300 : 0
 
-        player.swipe_points -= 1
-        // await check_dead()
+        setTimeout(async () => {
+            const is_dead = check_dead()
+            console.log('is_dead', is_dead)
+            if (is_dead)
+                await sleep(500)
 
-        setTimeout(() => {
+            // query one more time because of possible exception if cards are dead
+            card = world.qo(new OnBoard(key))
+            neighbour = world.qo(new OnBoard(key_other))
+
+
+            card.remove(OnBoard)
+            neighbour.remove(OnBoard)
+
+            card.add(new OnBoard(key_other))
+            neighbour.add(new OnBoard(key))
+
+            player.swipe_points -= 1
+            anim_swipe_points()
+            anim_swipe(key, key_other)
+
+            await sleep(250)
+
             can_process = true
-        }, 250)
+        }, delay)
         return
     }
 
@@ -244,11 +282,14 @@ const process_event = (data) => {
         world.q(OnCardAttacked, OnBoard).forEach(ent => {
             const {on_card_attacked} = mobs_map.get(ent.get(CardVariant))
             on_card_attacked(ent, target, active_item)
+            console.log('sadad')
         })
 
         setTimeout(() => {
             check_dead()
             actions.ensure_active_item()
+            actions.ensure_faded()
+            anim_faded()
             setTimeout(anim_hand_selection, 100)
         }, 250)
         // parse_all()
@@ -256,27 +297,57 @@ const process_event = (data) => {
         // parse_all()
 
         // parse_all()
-
-
     } else {
         actions.deselect()
         actions.select_item_from_hand(key)
         anim_hand_selection()
+        actions.ensure_faded()
+        anim_faded()
         // parse_all()
     }
-
 }
+
 const card_event = (elem) => {
-    return (action) => {
-        return process_event({
+    return async (action) => {
+        return await process_event({
             key: extract_digits(elem.id),
             location: elem.id.includes('hand') ? 'hand' : 'board',
             action
         })
     }
 }
-export const create_card = (cfg: { i, ent?, no_events? }) => {
-    const {i, ent, no_events} = cfg
+
+export const find_image = (ent, for_css = false) => {
+    const folders = new Map([
+        [E_CardType.food, 'food'],
+        [E_CardType.weapon, 'weapons'],
+        [E_CardType.crate, 'misc'],
+        [E_CardType.coin, 'misc'],
+        [E_CardType.mob, 'mobs']
+    ])
+    const type = ent.get(CardType)
+    const variant = ent.get(CardVariant)
+
+    const folder = folders.get(type)
+    const file_name = variant || type
+    const ext = type === E_CardType.mob ? 'gif' : 'png'
+
+    if (type === E_CardType.mob) {
+        const ld = extract(LevelData)
+        return img_url(
+            `${folder}/${ld.theme}/${file_name}.${ext}`,
+            for_css
+        )
+    }
+
+
+    return img_url(
+        `${folder}/${file_name}.${ext}`,
+        for_css
+    )
+}
+export const create_card = (cfg: { i, ent?, no_events?, transparent? }) => {
+    const {i, ent, no_events, transparent} = cfg
 
     const location = (i).toString().includes('hand') ? 'card-hand' : 'card-board'
 
@@ -288,7 +359,9 @@ export const create_card = (cfg: { i, ent?, no_events? }) => {
         img = find_image(ent, true)
     }
 
-    const card = new_element(`<div class="card ${location}" id="card-${i}"></div>`)
+    const card = new_element(`<div class="card ${location}" id="card-${i}"></div>`, {
+        opacity: transparent ? 0 : 1
+    })
 
     if (!no_events) {
         card.ontouchend = touch_end(card, card_event(card))
@@ -356,6 +429,7 @@ const create_board = () => {
         )
     }
 }
+
 const create_hand = () => {
     const hand = document.querySelector('.hand')
 
@@ -364,8 +438,10 @@ const create_hand = () => {
 
         const card = create_card({
             i: 'hand' + i,
-            ent: ent
+            ent: ent,
+            transparent: ent === undefined
         })
+
         hand.appendChild(card)
     }
 }
@@ -407,12 +483,32 @@ const setup = () => {
 
     actions.init_board()
 }
+
+
+export const anim_faded = () => {
+    const faded = world.q(IsFaded).map(ent => ent.get(OnBoard))
+    for (let i = 0; i < cards_amount; i ++) {
+        const targets = q('#card-'+ i)
+        const opacity = in_array(faded, i) ? 0.6 : 1
+        anime({
+            targets,
+            duration: 50,
+            easing: 'easeOutQuint',
+            opacity
+        })
+    }
+}
+
 const start_turn = async () => {
     actions.start_turn()
+
     actions.ensure_active_item()
+    actions.ensure_faded()
+    anim_faded()
+
     await sleep(200)
     // await check_dead()
-
+    anim_swipe_points()
     anim_hand_selection()
 
 
@@ -421,11 +517,11 @@ const flip_all = async () => {
     const numbers = shuffleArray([...range(0, cards_amount)])
     for (let i of numbers) {
         const card = document.querySelector('#card-' + i)
-        console.log('#card-' + i, card)
         flip_card(card)
-        // await sleep(50)
+        await sleep(15)
     }
 }
+
 const move_deck = async () => {
 
     for (let x = 2; x >= 0; x--) {
@@ -446,12 +542,12 @@ const move_deck = async () => {
 
     anime({
         targets: '.card-board',
-        translateY: '112%',
+        // easing: 'linear',
+        translateY: '109.01%',
         duration: 500,
-        complete: () => {
+        complete: async () => {
             for (let y = 0; y < (cards_amount / 3); y++) {
                 for (let x = 0; x < 3; x++) {
-                    console.log(x, y)
                     const elem = document.querySelector('#card-' + from_v([x, y]))
                     if (y === max_card_y) {
                         anime.set(elem, {
@@ -494,24 +590,26 @@ const move_deck = async () => {
 
         }
     })
-
-
-    // return
-
-
 }
+
+
 const end_turn = async () => {
     console.log('end turn')
     actions.end_turn()
 
-    check_dead()
+    if (actions.trigger_on_end_turn()) {
+        if (check_dead())
+            await sleep(350 + 400)
+        else
+            await sleep(350)
+    }
+
+
 
     const pd = get_godlike.player_data()
-    pd.swipe_points = 2
+    pd.swipe_points = pd.swipe_points_max
 
     await move_deck()
-    actions.ensure_active_item()
-    actions.ensure_faded()
 
     await sleep(1000)
 
@@ -520,7 +618,6 @@ const end_turn = async () => {
 }
 
 export const run_level = async () => {
-    document.querySelector('.play').addEventListener('click', flip_all)
     document.querySelector('.next-turn').addEventListener('click', end_turn)
 
     setup()

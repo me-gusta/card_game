@@ -1,5 +1,5 @@
-import {create_card} from "./level";
-import {find_image, img_url, q} from "../animations/helpers";
+import {create_card, find_image} from "./level";
+import {img_url, q} from "../animations/helpers";
 import {flip_card} from "../animations/flip";
 import anime from "animejs/lib/anime.es";
 import {world} from "../game/create_world";

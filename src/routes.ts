@@ -1,18 +1,18 @@
-import {run_level} from "./routes/level";
-import {init_route} from "./routing";
-import {get_run_data, get_segment, init_run, print_segments} from "./routes/run_manager";
-import {world} from "./game/create_world";
-import {GodLike, LevelResults, RunData} from "./game/components";
-import {world_global} from "./global/create_world";
-import {new_element, q, sleep} from "./animations/helpers";
-import {deck} from "./routes/deck";
-import anime from "animejs/lib/anime.es";
-import {lib_mobs} from "./global/libs";
+import {run_level} from "./routes/level"
+import {init_route} from "./routing"
+import {get_run_data, get_segment, init_run, print_segments} from "./routes/run_manager"
+import {world} from "./game/create_world"
+import {DevData, GodLike, LevelData, LevelResults, RunData} from "./game/components"
+import {extract, set_single, world_global} from "./global/create_world"
+import {new_element, q, sleep} from "./animations/helpers"
+import {deck} from "./routes/deck"
+import anime from "animejs/lib/anime.es"
+import {lib_mobs, lib_weapons, mobs_by_theme} from "./global/libs"
 
 
 const level = {
     content: `
-        <div class="wrap level bg bg-dungeon">
+        <div class="wrap level bg">
             <div class="header">
                 <div class="group">
                     <div class="btn-header">
@@ -40,12 +40,18 @@ const level = {
                         <div class="statistics-portrait"></div>
                     </div>
                     
-                    <div class="statistics-hp">
-                        <div class="statistics-hp-text">
-                            <span class="hp">20</span>/<span class="hp-max">20</span>
+                    <div class="statistics-group">
+                        <div class="statistics-row statistics-hp">
+                            <div class="icon"></div>
+                            <div class="statistics-text">
+                                <span class="hp">20</span>/<span class="hp-max">20</span>
+                            </div>
                         </div>
-                        <div class="statistics-hp-icon">
-                            
+                        <div class="statistics-row statistics-power">
+                            <div class="icon"></div>
+                            <div class="statistics-hp-text">
+                                <span class="power">1</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -60,6 +66,9 @@ const level = {
 
         </div>`,
     init: async () => {
+
+        const ld = extract(LevelData)
+        q('.bg').classList.add(`bg-${ld.theme}`)
 
         q('.settings').addEventListener('click', () => {
             init_route(menu)
@@ -212,18 +221,36 @@ const menu = {
             direction: 'alternate',
         })
 
-        q('.play-area').addEventListener('click', async () => {
+        const play_area = q('.play-area')
+
+        play_area.addEventListener('click', async () => {
             await init_route(run_manager)
         })
         q('.deck').addEventListener('click', async () => {
             await init_route(deck)
         })
         q('.dev-btn').addEventListener('click', async () => {
-            console.log(dev)
             await init_route(dev)
         })
 
+        let touchstartX = 0
+        let touchstartY = 0
+        let touchendX = 0
+        let touchendY = 0
 
+
+        play_area.addEventListener('touchstart', async (event) => {
+            touchstartX = event.changedTouches[0].screenX
+            touchstartY = event.changedTouches[0].screenY
+        }, false)
+
+        play_area.addEventListener('touchend', async (event) => {
+            touchendX = event.changedTouches[0].screenX
+            touchendY = event.changedTouches[0].screenY
+            if (touchendY < touchstartY) {
+                await init_route(run_manager)
+            }
+        }, false)
     }
 }
 
@@ -339,7 +366,7 @@ const dev = {
         </div>
         <div class="row">
             Локация
-            <select class="location">
+            <select class="theme" id="theme">
               <option value="dungeon">Сумрачный Лес</option>
               <option value="sea">Река Безысходности</option>
               <option value="hell">Царство Тьмы</option>
@@ -354,22 +381,25 @@ const dev = {
         </div>
         <div class="row">
             Обычный 1
-            <select class="mobs">
+            <select class="mobs" id="mob-common-1">
             </select>
         </div>
         <div class="row">
             Обычный 2
-            <select class="mobs">
+            <select class="mobs" id="mob-common-2">
             </select>
         </div>
         <div class="row">
-            Редкий 1
-            <select class="mobs">
+            Редкий
+            <select class="mobs" id="mob-rare">
             </select>
         </div>
         <div class="row">
-            Редкий 2
-            <select class="mobs">
+            Оружие
+        </div>
+        <div class="row">
+            Обычное
+            <select class="weapons" id="weapon-basic">
             </select>
         </div>
         
@@ -381,17 +411,83 @@ const dev = {
     </div>
     `,
     init: async () => {
-        const elem_mobs = document.querySelectorAll('.mobs')
+        const el_is_on = q('#is-on')
+        const el_theme = q('#theme')
+        const el_is_gen = q('#is-gen')
+        const el_common_1 = q('#mob-common-1')
+        const el_common_2 = q('#mob-common-2')
+        const el_rare = q('#mob-rare')
+        const el_weapon = q('#weapon-basic')
 
-        for (let name of Object.keys(lib_mobs)) {
-            for (let elem of elem_mobs)
-                elem.appendChild(new_element(
-                    `<option value="${name}">${name}</option>`
+
+        const add_weapons  = () => {
+            for (let weapon in lib_weapons)
+                el_weapon.appendChild(new_element(
+                    `<option value="${weapon}">${weapon}</option>`
                 ))
         }
 
+        add_weapons()
+
+        const add_mobs = () => {
+            const elem_mobs = document.querySelectorAll('.mobs')
+            const theme = el_theme.value
+            const list = mobs_by_theme[theme]
+            for (let elem of elem_mobs) {
+                elem.innerHTML = ''
+                for (let name of list)
+                    elem.appendChild(new_element(
+                        `<option value="${name}">${name}</option>`
+                    ))
+            }
+            const dev_data = extract(DevData)
+            el_common_1.value = dev_data.common_1
+            el_common_2.value = dev_data.common_2
+            el_rare.value = dev_data.rare
+        }
+
+        const dev_data = extract(DevData)
+
+        if (dev_data.is_on !== undefined) {
+            el_is_on.checked = dev_data.is_on
+            el_theme.value = dev_data.theme
+            el_is_gen.checked = dev_data.is_gen
+            el_common_1.value = dev_data.common_1
+            el_common_2.value = dev_data.common_2
+            el_rare.value = dev_data.rare
+            el_weapon.value = dev_data.weapon
+            console.log(dev_data)
+        }
+
+        add_mobs()
+        el_theme.onchange = add_mobs
+
         q('.exit').addEventListener('click', () => {
             init_route(menu)
+        })
+        q('.save').addEventListener('click', () => {
+            const is_on = el_is_on.checked
+            const theme = el_theme.value
+            const is_gen = el_is_gen.checked
+            const common_1 = el_common_1.value
+            const common_2 = el_common_2.value
+            const rare = el_rare.value
+            const weapon = el_weapon.value
+
+            const dev_data_new = {
+                is_on,
+                theme,
+                is_gen,
+                common_1,
+                common_2,
+                rare,
+                weapon
+            }
+            set_single(
+                new DevData(dev_data_new)
+            )
+
+            localStorage.setItem('dev_data', JSON.stringify(dev_data_new))
         })
     }
 }

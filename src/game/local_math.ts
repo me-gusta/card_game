@@ -22,7 +22,12 @@ export const select = (filters=undefined, pattern=undefined) => {
     if (pattern === undefined) {
         candidates = world.q(OnBoard)
     } else {
-        for (let pos of pattern) candidates.push(world.qo(new OnBoard(from_v(pos))))
+        for (let pos of pattern) {
+            const candidate = world.qo(new OnBoard(from_v(pos)))
+            console.log(candidate)
+            if (candidate)
+                candidates.push(candidate)
+        }
     }
 
 
@@ -61,13 +66,12 @@ export const relative = (ent: Entity, filter, pattern) => {
 export const pattern_around = [[0, 0],[0, 1], [0, -1], [1, 0], [-1, 0]]
 export const pattern_row = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]]
 export const pattern_col = [
-    [0, 3],[0, 2], [0, 1],
+    [0, 2], [0, 1],
     [0, 0],
-    [0, -1], [0, -2], [0, -3]
+    [0, -1], [0, -2]
 ]
 
 export const pattern_chess = [
-    [2, 3],[0, 3],
     [1, 2],
     [2, 1],[0, 1],
     [1, 0],
@@ -77,5 +81,5 @@ export const pattern_closest = [
     [0, 0], [1, 0], [2, 0]
 ]
 export const pattern_farthest = [
-    [0, 3], [1, 3], [2, 3]
+    [0, 2], [1, 2], [2, 2]
 ]

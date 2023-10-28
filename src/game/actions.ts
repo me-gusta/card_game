@@ -211,6 +211,8 @@ const ensure_faded =() => {
     world.q(OnBoard).forEach(ent => {
         if (!in_array(candidates, ent.id))
             ent.add(IsFaded)
+        else if (ent.has(IsFaded))
+            ent.remove(IsFaded)
     })
 }
 
@@ -264,11 +266,17 @@ const end_turn = () => {
         }
     }
 
+}
+
+const trigger_on_end_turn = () => {
+    let activated = false
     // TRIGGER
     world.q(OnTurnEnd, OnBoard).forEach(ent => {
         const {on_turn_end} = mobs_map.get(ent.get(CardVariant))
         on_turn_end(ent)
+        activated = true
     })
+    return activated
 }
 
 const clear_effects = () => {
@@ -295,5 +303,6 @@ export default {
     ensure_active_item,
     ensure_faded,
     start_turn,
-    end_turn
+    end_turn,
+    trigger_on_end_turn
 }

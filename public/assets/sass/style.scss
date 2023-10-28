@@ -253,24 +253,45 @@ $header_height: 43px;
   color: $header_color;
   font-size: 16px;
 
+  &-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .group {
     display: flex;
     align-items: center;
     gap: 5px;
     height: 100%;
   }
+  &-group {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    gap: 5px
+  }
+
+  .icon {
+    image-rendering: pixelated;
+    background-position: center center;
+    background-size: contain;
+  }
+
+  &-power {
+    .icon {
+      background-image: url("../images/level/energy.png");
+      width: 24px;
+      height: 24px;;
+    }
+  }
 
   &-hp {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    &-icon {
-      image-rendering: pixelated;
-      background-image: url("../images/level/heart.png");
+    .icon {
       width: 24px;
       height: 24px;
-      background-position: center center;
-      background-size: contain;
+      background-image: url("../images/level/heart.png");
     }
   }
 
@@ -729,3 +750,4 @@ $header_height: 43px;
     gap: 15px;
   }
 }
+

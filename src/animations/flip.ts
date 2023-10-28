@@ -1,7 +1,8 @@
 import anime from "animejs/lib/anime.es";
-import {extract_digits, find_image, img_css, img_url} from "./helpers";
+import {extract_digits, img_css, img_url, q} from "./helpers";
 import {world} from "../game/create_world";
 import {InHand, OnBoard, Value} from "../game/components";
+import {find_image} from "../routes/level";
 
 const duration = 200 //* 20
 const ease1 = 'easeOutQuad'
@@ -631,4 +632,8 @@ export const flip_card = (card, cfg: {
             )
         })
     }
+}
+
+export const flip_entity = (ent) => {
+    flip_card(q('#card-'+ ent.get(OnBoard)))
 }
