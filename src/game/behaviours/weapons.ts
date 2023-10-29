@@ -35,7 +35,7 @@ const calc_damage = (actor, target) => {
 
 export const weapons_map = new Map([
     [lib_weapons.sword, {
-        value_range: [3, 7],
+        value_range: [3, 14],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
@@ -47,7 +47,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.mace, {
-        value_range: [2, 3],
+        value_range: [3, 10],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
@@ -60,7 +60,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.scythe, {
-        value_range: [2, 4],
+        value_range: [5, 10],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
@@ -73,7 +73,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.whip, {
-        value_range: [2, 4],
+        value_range: [2, 11],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
@@ -86,7 +86,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.shuriken, {
-        value_range: [2, 4],
+        value_range: [2, 9],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
@@ -105,7 +105,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.shovel, {
-        value_range: [2, 4],
+        value_range: [7, 15],
         pattern: pattern_chess,
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
@@ -118,7 +118,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.dagger, {
-        value_range: [2, 4],
+        value_range: [5, 19],
         pattern: pattern_closest,
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
@@ -131,7 +131,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.frying_pan, {
-        value_range: [2, 4],
+        value_range: [12, 17],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             const value_target = target.get(Value)
@@ -158,7 +158,7 @@ export const weapons_map = new Map([
         description: '',
     }],
     [lib_weapons.stick, {
-        value_range: [2, 4],
+        value_range: [10, 40],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
             target.modify(Value).sub(dmg)

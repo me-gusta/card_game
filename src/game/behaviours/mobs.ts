@@ -62,7 +62,7 @@ export const mobs_map = new Map([
         value_range: [2, 5]
     }],
     [lib_mobs.rat, {
-        value_range: [3, 7],
+        value_range: [3, 12],
         on_consume: (actor: Entity) => {
             const value = actor.get(Value)
             const godlike = get_godlike.godlike()
@@ -73,7 +73,7 @@ export const mobs_map = new Map([
         }
     }],
     [lib_mobs.cyclops, {
-        value_range: [3, 7],
+        value_range: [3, 12],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
             if (other.get(CardType) !== E_CardType.food)
@@ -85,7 +85,7 @@ export const mobs_map = new Map([
         }
     }],
     [lib_mobs.hound, {
-        value_range: [3, 7],
+        value_range: [5, 12],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
             half_or_kill(other)
@@ -108,7 +108,7 @@ export const mobs_map = new Map([
         }
     }],
     [lib_mobs.zombie, {
-        value_range: [3, 7],
+        value_range: [20, 35],
         triggers: [OnTurnEnd],
         on_turn_end: (actor: Entity) => {
             half_or_kill(actor)

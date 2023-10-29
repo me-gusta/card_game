@@ -17,9 +17,9 @@ const test_gen_one = () => {
     }
 
     const amounts: any[] = [
-        ['mob', 46],
-        ['food', 13],
-        ['weapon', 16]
+        ['mob', 51],
+        ['food', 10],
+        ['weapon', 14]
     ]
     // const amounts: any[] = [
     //     ['mob', 3],
