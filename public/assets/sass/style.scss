@@ -54,12 +54,15 @@ img {
 
 .debug {
   &-data {
+    display: none;
 
     position: absolute;
     bottom: 40px;
     width: 100%;
   }
+
   &-ui {
+    display: none;
     position: absolute;
     bottom: 30px;
     width: 100%;
@@ -88,7 +91,7 @@ $header_height: 43px;
     width: 100%;
     height: $header_height;
     image-rendering: pixelated;
-    background-image:  url("../images/textures/planks.png");
+    background-image: url("../images/textures/planks.png");
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -246,9 +249,9 @@ $header_height: 43px;
   justify-content: space-between;
   padding: 0 20px;
   //background: $theme4;
-  background-image:  url("../images/textures/planks.png");
+  background-image: url("../images/textures/planks.png");
   image-rendering: pixelated;
-  box-shadow:  4px 4px 8px 12px rgba(30, 30, 30, 0.3);
+  box-shadow: 4px 4px 8px 12px rgba(30, 30, 30, 0.3);
   font-family: "pixel", sans-serif;
   color: $header_color;
   font-size: 16px;
@@ -265,6 +268,7 @@ $header_height: 43px;
     gap: 5px;
     height: 100%;
   }
+
   &-group {
     display: flex;
     flex-direction: column;
@@ -360,8 +364,8 @@ $header_height: 43px;
 }
 
 .slider .card {
-  width: 150px!important;
-  height: 150px!important;
+  width: 150px !important;
+  height: 150px !important;
 }
 
 .slider-control {
@@ -382,20 +386,32 @@ $header_height: 43px;
 }
 
 .in-use .card {
-  width: 85px!important;
-  height: 85px!important;
+  width: 85px !important;
+  height: 85px !important;
 }
+
+.text-shadow {
+  text-shadow: black 2px 2px;
+}
+
+
 
 .bg {
   background-size: 64px;
   image-rendering: pixelated;
 
+  &-planks {
+    background-image: url("../images/textures/planks.png");
+  }
+
   &-dungeon {
     background-image: url("../images/textures/dungeon.png");
   }
+
   &-sea {
     background-image: url("../images/textures/sea.png");
   }
+
   &-hell {
     background-image: url("../images/textures/hell.png");
   }
@@ -433,6 +449,7 @@ $header_height: 43px;
     width: 100%;
     height: 100%;
     z-index: 1;
+
     .bg {
       position: absolute;
       left: 0;
@@ -486,8 +503,8 @@ $header_height: 43px;
     z-index: 2;
     position: absolute;
     width: 60%;
-    height: 40%;
-    top: 30%;
+    height: 70%;
+    top: 20%;
     margin: auto;
   }
 
@@ -515,11 +532,12 @@ $header_height: 43px;
     height: 48px;
     image-rendering: pixelated;
     background-size: contain;
-    background-repeat:  no-repeat;
+    background-repeat: no-repeat;
 
     &.spellbook {
       background-image: url("../images/menu/spellbook.png");
     }
+
     &.wardrobe {
       background-image: url("../images/menu/wardrobe.png");
     }
@@ -532,32 +550,47 @@ $header_height: 43px;
 
   .header-dungeon {
     background-image: url("../images/map_preview/dungeon_header.png");
-    color: $text;
   }
+
   .header-sea {
     background-image: url("../images/map_preview/sea_header.png");
-    color: #b7dcdf;
   }
+
   .header-hell {
     background-image: url("../images/map_preview/hell_header.png");
-    color: #e77373;
+  }
+
+  .color-dungeon {
+    color: $text;
+  }
+
+  .color-sea {
+    color: #b7dcdf;
+  }
+
+  .color-hell {
+    color: #fd8484;
   }
 
   .sep-dungeon {
     background-image: url("../images/map_preview/grass.png");
   }
+
   .sep-sea {
     background-image: url("../images/map_preview/sea_sep.png");
   }
+
   .sep-hell {
     background-image: url("../images/map_preview/hell_sep.png");
   }
 
   .header {
+    box-shadow: 4px 4px 8px 12px rgba(30, 30, 30, 0.3);
     width: 100%;
     height: 15%;
     background-size: 64px;
     image-rendering: pixelated;
+    z-index: 10;
 
     display: flex;
     flex-direction: column;
@@ -590,6 +623,183 @@ $header_height: 43px;
     }
   }
 
+  .footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    box-shadow: 4px 4px 8px 12px rgba(30, 30, 30, 0.3);
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .letter {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      letter-spacing: 1px;
+      span {
+        min-height: 22px;
+      }
+    }
+
+    .text-wrap {
+      font-size: 9px;
+    }
+    .icon-wrap {
+      position: absolute;
+      right: 0;
+      //top: -127%;
+    }
+
+    .bg-map-portrait {
+      image-rendering: pixelated;
+      background-size: 90px;
+      width: 70px;
+      height: 70px;
+      padding: 15px;
+      background-position: center;
+      &.dungeon {
+        background-image: url("../images/box_opener/spiral2.gif");
+      }
+      &.sea {
+        background-image: url("../images/box_opener/spiral2_sea.gif");
+      }
+      &.hell {
+        background-image: url("../images/box_opener/spiral2_hell.gif");
+      }
+    }
+
+    .portrait {
+      image-rendering: pixelated;
+      background-image: url("../images/portraits/Icons_01.png");
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+    }
+  }
+
+  .choice {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 15%;
+    left: 0;
+    padding: 60px;
+
+    &-heading {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    &-btns {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: "a b"
+                           "c c";
+    }
+
+    &-btn {
+      background: #3b2722;
+      height: 120px;
+      width: 100%;
+      font-size: 10px;
+      padding: 10px;
+      display: flex;
+      align-items: end;
+      position: relative;
+      background-blend-mode: multiply;
+      box-shadow: 4px 4px 5px 1px rgba(30, 30, 30, 0.9);
+      cursor: pointer;
+
+      &.dungeon {
+        background: url("../images/map_preview/btn_dungeon.png"), #7fac48;
+      }
+
+      &.sea {
+        background: url("../images/map_preview/btn_dungeon.png"), #48aca0;
+      }
+
+      &.hell {
+        background: url("../images/map_preview/btn_dungeon.png"), #ac4857;
+      }
+
+      .icon {
+        image-rendering: pixelated;
+        background-size: contain;
+        background-repeat: no-repeat;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 50px;
+        height: 50px;
+
+        &-hp {
+          background-image: url("../images/map_preview/hp.png");
+        }
+
+        &-weapon {
+          background-image: url("../images/map_preview/smith.png");
+        }
+
+        &-heal {
+          background-image: url("../images/map_preview/sleep.png");
+        }
+      }
+
+      &.max-hp {
+        grid-area: a;
+      }
+
+      &.weapons {
+        grid-area: b;
+      }
+
+      &.heal {
+        grid-area: c;
+      }
+    }
+  }
+
+
+  .rotator {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    top: 42%;
+    &-inside {
+      position: relative;
+    }
+
+    .vertical {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      gap: 10px;
+      &.top {
+        padding-bottom: 10px;
+        bottom: 100%;
+      }
+      &.bottom {
+        padding-top: 10px;
+        top: 100%;
+        opacity: 0.6;
+      }
+    }
+  }
 
   .m1 {
     width: 64px;
@@ -609,12 +819,23 @@ $header_height: 43px;
 
   .marker {
     image-rendering: pixelated;
+    background-repeat: no-repeat;
+    background-position: center center;
+
     &-skull {
       width: 64px;
       height: 64px;
       background-size: 64px;
       background-image: url("../images/map_preview/skull.png")
     }
+
+    &-skull-killed {
+      width: 64px;
+      height: 64px;
+      background-size: 64px;
+      background-image: url("../images/map_preview/skull_killed.png")
+    }
+
     &-chest {
       width: 100px;
       height: 64px;
@@ -625,10 +846,13 @@ $header_height: 43px;
 }
 
 @keyframes Animation {
-  0%{background-position: 0 0}
-  100%{background-position: 100% 0}
+  0% {
+    background-position: 0 0
+  }
+  100% {
+    background-position: 100% 0
+  }
 }
-
 
 
 .bg-rainbow {
@@ -651,13 +875,14 @@ $header_height: 43px;
     bottom: -160px;
     border-radius: 200px;
     box-shadow: -22px 0px 14px -1px rgba(0, 0, 0, 0.10) inset,
-              22px 0px 14px -1px rgba(219, 190, 187, 0.15) inset;
+    22px 0px 14px -1px rgba(219, 190, 187, 0.15) inset;
   }
 
   .spiral {
     background-size: cover;
     image-rendering: pixelated;
     position: absolute;
+
     &-1 {
       background-image: url("../images/box_opener/spiral1.gif");
       width: 1025px;
@@ -706,19 +931,23 @@ $header_height: 43px;
       top: 23%;
       left: 24%;
     }
+
     &-5 {
       top: 29%;
       left: 10%;
     }
   }
+
   .box {
     position: relative;
-    width: 220px;
+    width: 200px;
     height: 140px;
     z-index: 3;
 
     .sprite {
-      background-size: cover;
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
       image-rendering: pixelated;
       position: absolute;
     }
@@ -726,7 +955,7 @@ $header_height: 43px;
     &-front {
       background-image: url("../images/map_preview/chest.png");
       z-index: 2;
-      width: 220px;
+      width: 200px;
       height: 140px;
     }
 
@@ -751,3 +980,6 @@ $header_height: 43px;
   }
 }
 
+.display-none {
+  display: none!important;
+}

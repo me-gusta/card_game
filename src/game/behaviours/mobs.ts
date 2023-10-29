@@ -113,6 +113,7 @@ export const mobs_map = new Map([
         on_turn_end: (actor: Entity) => {
             half_or_kill(actor)
             anim_deal_damage(actor)
+            return true
         }
     }],
     [lib_mobs.ghost, {
@@ -142,12 +143,15 @@ export const mobs_map = new Map([
         value_range: [3, 7],
         triggers: [OnTurnEnd],
         on_turn_end: (actor: Entity) => {
+            let activated = false
             relative(actor, [], pattern_around).forEach(ent => {
                 if (ent.get(CardType) !== E_CardType.food)
                     return
                 ent.modify(Value).set(0)
                 anim_deal_damage(ent)
+                activated = true
             })
+            return activated
         }
     }],
     [lib_mobs.minotaur, {
@@ -204,6 +208,7 @@ export const mobs_map = new Map([
         value_range: [3, 7],
         triggers: [OnTurnEnd],
         on_turn_end: (actor: Entity) => {
+            let activated = false
             relative(actor, [], pattern_around).forEach(ent => {
                 if (ent.get(CardType) !== E_CardType.coin)
                     return
@@ -225,7 +230,9 @@ export const mobs_map = new Map([
                 flip_card(q('#card-' + key))
 
                 flip_entity(actor)
+                activated = true
             })
+            return activated
         }
     }],
     [lib_mobs.devil, {
@@ -248,6 +255,7 @@ export const mobs_map = new Map([
 
             create.mob('imp', key)
             flip_card(q('#card-' + key))
+            return true
         }
     }]
 ])

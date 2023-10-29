@@ -1,11 +1,11 @@
 import anime from "animejs/lib/anime.es.js";
 import {CardVariant, InHand, OnBoard, Value} from "../game/components";
 import get_godlike from "../game/get_godlike";
+import {q} from "./helpers";
 
-
-export const anim_bounce_card = (card) => {
+export const anime_shake = (targets) => {
     anime.timeline({
-        targets: card.parentNode,
+        targets: targets,
     }).add({
         scaleX: 0.8,
         scaleY: 0.9,
@@ -31,10 +31,14 @@ export const anim_bounce_card = (card) => {
     )
 }
 
+export const anim_bounce_card = (card) => {
+    anime_shake(card.parentNode)
+}
+
 
 
 export const anim_use_card = (ent) => {
-    const card = document.querySelector('#card-hand' + ent.get(InHand))
+    const card = q('#card-hand' + ent.get(InHand))
     anime.timeline({
         targets: card,
     }).add({
@@ -81,7 +85,7 @@ export const anim_attack_card = (ent) => {
 }
 
 export const anim_collect_card = (ent) => {
-    const card = document.querySelector('#card-' + ent.get(OnBoard))
+    const card = q('#card-' + ent.get(OnBoard))
     anime.set(card.parentElement,
         {
             'z-index': 90
@@ -126,18 +130,29 @@ export const anim_fade_card = (ent) => {
     })
 }
 
-export const anim_hero_take_damage = () => {
-    const elem_hp = document.querySelector('.hp')
+export const anim_set_hp = () => {
+
+    const elem_hp = q('.hp')
     const pd = get_godlike.player_data()
     elem_hp.textContent = pd.hp
 }
+export const anim_hero_take_damage = () => {
+    anim_set_hp()
+    anime_shake('.statistics-portrait')
+}
 
+export const anim_collect_coins = () => {
+    const pd = get_godlike.player_data()
+    const elem = q('.coins')
+    elem.textContent = pd.coins
+}
 
 export const anim_hero_heal = () => {
-    anim_hero_take_damage()
+    anim_set_hp()
 }
 
 export const anim_new_weapon = (key) => {
+    console.log('new weapon')
     const card = '#card-hand' + key
     anime({
         targets: card,
@@ -149,7 +164,7 @@ export const anim_new_weapon = (key) => {
 }
 
 export const anim_weapon_exit = (key) => {
-    const card =  document.querySelector('#card-hand' + key)
+    const card =  q('#card-hand' + key)
     const parent = card.parentElement
     if (parent.classList.contains('active'))
         parent.classList.remove('active')
@@ -163,7 +178,7 @@ export const anim_weapon_exit = (key) => {
     })
 }
 export const anim_weapon_move = (key) => {
-    const card =  document.querySelector('#card-hand' + key)
+    const card =  q('#card-hand' + key)
     const parent = card.parentElement
     if (parent.classList.contains('active'))
         parent.classList.remove('active')
@@ -178,7 +193,7 @@ export const anim_weapon_move = (key) => {
 
 export const anim_deal_damage = (ent) => {
     const key = ent.get(OnBoard)
-    const card = document.querySelector('#card-' + key)
+    const card = q('#card-' + key)
     anim_bounce_card(card)
     card.querySelector('.card-value').textContent = ent.get(Value)
 }

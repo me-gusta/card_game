@@ -16,13 +16,14 @@ import {in_array} from "./helpers";
 import {mobs_map} from "./behaviours/mobs";
 import {
     anim_attack_card,
-    anim_collect_card,
+    anim_collect_card, anim_collect_coins,
     anim_fade_card, anim_hero_heal,
     anim_hero_take_damage,
     anim_new_weapon, anim_weapon_exit, anim_weapon_move
 } from "../animations/interactions";
 import {update_card} from "../animations/flip";
 import anime from "animejs/lib/anime.es.js";
+import {q} from "../animations/helpers";
 
 const init_board = () => {
     for (let y = 0; y < 3; y++) {
@@ -76,6 +77,7 @@ const consume_card = (on_board_id: number) => {
             player.coins += value
             anim_collect_card(card)
             world.killEntity(card)
+            anim_collect_coins()
             break
         }
         case E_CardType.crate: {
@@ -135,23 +137,34 @@ const consume_card = (on_board_id: number) => {
 
                 }, 110)
             } else {
-                if (in_hand.length === 2) {
-                    const a = in_hand[0].get(InHand)
-                    const b = in_hand[1].get(InHand)
-                    console.log(a, b)
-                    if (a === 0 && b === 2)
-                        in_hand_id = 1
-                    if (a === 1 && b === 2)
-                        in_hand_id = 0
+                // if (in_hand.length === 2) {
+                //     const a = in_hand[0].get(InHand)
+                //     const b = in_hand[1].get(InHand)
+                //     console.log(a, b)
+                //     if (a === 0 && b === 2)
+                //         in_hand_id = 1
+                //     if (a === 1 && b === 2)
+                //         in_hand_id = 0
+                //
+                // }
+                const reserved = in_hand.map(ent => ent.get(InHand))
+                console.log(reserved)
+                for (let i = 0; i < 3; i ++) {
+                    console.log(i,  in_array(reserved, i))
+                    if (!in_array(reserved, i)) {
+                        anim_collect_card(card)
 
+
+                        card.remove(OnBoard)
+                        card.add(new InHand(i))
+
+                        update_card(q('#card-hand' + i), true)
+                        console.log('#card-hand' + i)
+                        anim_new_weapon(i)
+                        break
+                    }
                 }
-                anim_collect_card(card)
 
-                card.remove(OnBoard)
-                card.add(new InHand(in_hand_id))
-
-                update_card(document.querySelector('#card-hand' + in_hand_id), true)
-                anim_new_weapon(in_hand_id)
             }
 
 
@@ -193,6 +206,14 @@ const select_item_from_hand = (key: number) => {
     ensure_faded()
 }
 
+
+const remove_faded =() => {
+    world.q(OnBoard).forEach(ent => {
+        if (ent.has(IsFaded))
+            ent.remove(IsFaded)
+    })
+}
+
 const ensure_faded =() => {
     const card = world.qo(InHand, IsChosen)
     if (card === undefined) {
@@ -209,6 +230,7 @@ const ensure_faded =() => {
     const candidates = select(filters, pattern).map(ent => ent.id)
 
     world.q(OnBoard).forEach(ent => {
+        // console.log('candidat',ent.get(OnBoard), !in_array(candidates, ent.id))
         if (!in_array(candidates, ent.id))
             ent.add(IsFaded)
         else if (ent.has(IsFaded))
@@ -273,8 +295,8 @@ const trigger_on_end_turn = () => {
     // TRIGGER
     world.q(OnTurnEnd, OnBoard).forEach(ent => {
         const {on_turn_end} = mobs_map.get(ent.get(CardVariant))
-        on_turn_end(ent)
-        activated = true
+        if (on_turn_end(ent))
+            activated = true
     })
     return activated
 }
@@ -302,6 +324,7 @@ export default {
     deselect,
     ensure_active_item,
     ensure_faded,
+    remove_faded,
     start_turn,
     end_turn,
     trigger_on_end_turn

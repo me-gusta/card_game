@@ -1,14 +1,16 @@
 import {run_level} from "./routes/level"
 import {init_route} from "./routing"
-import {get_run_data, get_segment, init_run, print_segments} from "./routes/run_manager"
+import {get_segment, init_run, print_segments} from "./routes/run_manager"
 import {world} from "./game/create_world"
 import {DevData, GodLike, LevelData, LevelResults, RunData} from "./game/components"
-import {extract, set_single, world_global} from "./global/create_world"
+import {extract, purge, set_single, world_global} from "./global/create_world"
 import {new_element, q, sleep} from "./animations/helpers"
 import {deck} from "./routes/deck"
 import anime from "animejs/lib/anime.es"
 import {lib_mobs, lib_weapons, mobs_by_theme} from "./global/libs"
-
+import Typed from 'typed.js';
+import {getRandomChoice} from "./game/helpers";
+import {anime_shake} from "./animations/interactions";
 
 const level = {
     content: `
@@ -22,7 +24,7 @@ const level = {
                 <div class="group">
                     <div class="group-coins">
                         <div class="coins">
-                            15
+                            0
                         </div>
                         <div class="icon icon-coins"></div>
                     </div>
@@ -81,20 +83,26 @@ const level = {
 const run_manager = {
     content: ``,
     init: async () => {
-        let run_data = get_run_data()
+        let run_data = extract(RunData)
+        let theme = 'dungeon'
+        const dd = extract(DevData)
+        console.log(dd)
+        if (dd)
+            theme = dd.theme
 
         if (run_data === undefined) {
             world_global.qo(GodLike).add(
                 new RunData({
                     current_level: 1,
                     hp: 20,
-                    hp_max: 20
+                    hp_max: 20,
+                    coins: 0,
+                    theme
                 })
             )
-            run_data = get_run_data()
-        } else {
-            await init_route(map_preview)
+            run_data = extract(RunData)
         }
+        await init_route(map_preview)
 
         await init_run()
         await init_route(level)
@@ -117,47 +125,267 @@ const run_ender = {
         await init_route(run_manager)
     }
 }
+
+let letters = [
+    'ау, здесь кто-нибудь есть?',
+    'мерцанье доносится из полутьмы',
+    'я делаю первый шаг.',
+    'может это все зря?',
+    'вокруг мутные волные неуютности',
+    'меня одолевает голод',
+    'мне нравится этот странный запах',
+    'я чуть было не упал в ту яму',
+    'я не видел ее из далека',
+    'стон? звон? шепот?',
+    'кто говорит со мной по ночам',
+    'вы ничего не понимате.',
+    'я должен был поступить иначе',
+    'как это могло произойти со мной',
+    'я хочу вернуться домой',
+    'мне надоело это вязкое болото',
+    'я люблю убивать монстров',
+    'их не становиться меньше',
+    'этот туман никогда не рассеется',
+    'что здесь за странное место?',
+    'Похоже, эта тропа очень древняя',
+    'я уже где-то слышал про эти места',
+    'я не могу терпеть, мне тяжело',
+    'что вам от меня нужно?',
+    'я устал, я по колено в воде',
+    'мне нужен сон',
+    'зачем они меня будят?',
+    'стены покрыты густой слизью',
+    'мне уже нравится открывать двери',
+    'хорошо, что здесь есть оружие',
+    'с каждым мигом тяжелее дышать',
+    'чьё имя высечено на этих камнях?',
+    'они снова на меня смотрят.',
+    'зачем мне открылся этот путь',
+    'как я мог быть легкомысленным',
+    'я слишком далеко, чтобы сдаться',
+    'бескрайний, безобразный лабиринт',
+    'я помню как спокойно было в лесу',
+    'мне нужно что-то делать',
+    'хватит! перестаньте кричать!',
+    'кто меня оставил здесь?',
+    'я просто хочу остаться в покое.',
+    'повсюду надписи, я не знаю',
+    'этот язык, но мой меч',
+    'блестит когда я открываю дверь.',
+    'что они все от меня хотят?',
+    'почему их так много вокруг?',
+    'они хотят завершить мою жизнь.',
+    'мне не комфортно,',
+    'душно, влажно, нужен привал.',
+    'но как можно здесь оставаться',
+    'мне так свежо, это странно',
+    'моя голова покрылась пеплом',
+    'кто зажигает звезды?',
+    'они хотят чтобы я испытывал боль',
+    'я открыл новую дверь',
+    'мне нужно быть на стороже',
+    'временами мне вспоминается лес',
+    'меня атакует жажда тишины',
+    'я должен узнать что будет после',
+    'они знают каждый мой шаг',
+    'чем дальше, тем больше огня',
+    'кто это все придумал?',
+    'дикие звери, просторные коридоры',
+    'это все похоже на зоопарк',
+    'я все никак не могу успокоиться',
+    'скрежущий вопль...',
+    'я уже почти привык к тебе',
+    'я должен продолжать путь.',
+    'я так долго был в поиске причин.',
+    'Я вижу лучи солнца',
+    'может я здесь не случайно.',
+    'собрать хладнокровие в кулак',
+    'я смогу это сделать',
+    'я привык наблюдать огонь',
+    'получите! вы это заслуживаете!',
+    'подходи! по одному!',
+    'я готов! я готов! я готов!',
+    'раз-два-три...',
+    'камень...',
+    'славный ливень безупречного',
+]
+
+letters.sort((a, b) => b.length - a.length)
+// console.log(letters)
+// letters = letters.slice(0, 6)
+
+const set_type_anim = () => {
+    const strings = [getRandomChoice(letters),getRandomChoice(letters),getRandomChoice(letters)]
+    const type_speed = 50
+    let delay = 0
+    for (let i = 0 ; i < 3; i++) {
+        const str = strings[i]
+        setTimeout(() => {
+            new Typed(`.letter-${i}`, {
+                strings: [str],
+                typeSpeed: type_speed,
+                showCursor: false
+            })
+        }, delay)
+        delay += str.length * type_speed * 2
+    }
+}
+
 const map_preview = {
-    content: `<div class="wrap map bg">
-    <div class="header">
-        <div class="sep sep-top"></div>
-        <div class="title"></div>
-        <div class="lvl"></div>
-        <div class="sep sep-bot"></div>
-    </div>
-    
-    
+    content:
+        `<div class="wrap map bg">
+            <div class="header text-shadow">
+                <div class="sep sep-top"></div>
+                <div class="title"></div>
+                <div class="lvl"></div>
+                <div class="sep sep-bot"></div>
+            </div>
+            
+            <div class="choice">
+                <span class="choice-heading text-shadow">
+                    ● Настало время ● <br>
+                    Здесь выбор за тобой
+                </span>
+                <div class="choice-btns">
+                    <div class="choice-btn max-hp">
+                        <span>+ Запас<br>здоровья</span>
+                        <div class="icon icon-hp"></div>
+                    </div>
+                    <div class="choice-btn weapons">
+                        <span>+ Сила<br>оружия</span>
+                        <div class="icon icon-weapon"></div>
+                    </div>
+                    <div class="choice-btn heal">
+                        <span>Полное исцеление</span>
+                        <div class="icon icon-heal"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rotator">
+                <div class="rotator-inside">
+                    <div class="vertical top">
+                        <div class="marker marker-move marker-skull"></div>
+                        <div class="marker marker-move marker-skull"></div>
+                        <div class="marker marker-move marker-skull"></div>
+                        <div class="marker marker-move marker-skull"></div>
+                        <div class="marker marker-expand marker-skull"></div>
+                    </div>
+                    <div class="center">
+                        <div class="marker marker-skull"></div>
+                    </div>
+                    <div class="vertical bottom">
+                        <div class="marker marker-move marker-skull-killed"></div>
+                        <div class="marker marker-move marker-skull-killed"></div>
+                        <div class="marker marker-move marker-skull-killed"></div>
+                        <div class="marker marker-move marker-skull-killed"></div>
+                        <div class="marker marker-move marker-skull-killed"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer bg">
+                <div class="container">
+                    <div class="text-wrap">
+                        <div class="letter text-shadow">
+                            <span class="letter-0">...</span>
+                            <span class="letter-1">...</span>
+                            <span class="letter-2">...</span>
+                        </div>
+                    </div>
+                    <div class="icon-wrap">
+                        <div class="bg-map-portrait">
+                            <div class="portrait"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>`,
     init: async () => {
-        // const run_data = world_global.qo(GodLike).get(RunData)
-        const lvl = 3// run_data.current_level
+        console.log('RUN MAP PREVIEW')
+        const rd = world_global.qo(GodLike).get(RunData)
+        console.log(rd)
+        const lvl = rd.current_level
 
-        // set stylings
-        // let styling = 'hell'
-        // let styling = 'sea'
-        let styling = 'dungeon'
+        const theme = rd.theme
 
-        q('.bg').classList.add(`bg-${styling}`)
-        q('.header').classList.add(`header-${styling}`)
-        q('.sep-top').classList.add(`sep-${styling}`)
-        q('.sep-bot').classList.add(`sep-${styling}`)
+        q('.bg').classList.add(`bg-${theme}`)
+        q('.header').classList.add(`header-${theme}`)
+        q('.sep-top').classList.add(`sep-${theme}`)
+        q('.sep-bot').classList.add(`sep-${theme}`)
 
-        q('.title').textContent = 'Сумрачный Лес'
-        // q('.title').textContent = 'Мертвое Море'
-        // q('.title').textContent = 'Царство Тьмы'
+        q('.choice').classList.add(`color-${theme}`)
+        q('.header').classList.add(`color-${theme}`)
+        q('.footer').classList.add(`color-${theme}`)
+        q('.footer').classList.add(`header-${theme}`)
 
+        q('.bg-map-portrait').classList.add(`${theme}`)
+
+        document.querySelectorAll('.choice-btn').forEach(el => {
+            el.classList.add(`${theme}`)
+        })
+
+        if (theme === 'dungeon')
+            q('.title').textContent = 'Сумрачный Лес'
+        else if (theme === 'sea')
+            q('.title').textContent = 'Мертвое Море'
+        else if (theme === 'hell')
+            q('.title').textContent = 'Царство Тьмы'
+
+        q('.choice').classList.add('display-none')
+        // set_type_anim()
+
+        anime.set('.top .marker', {
+            'background-size': '48px'
+        })
+        anime.set('.bottom .marker', {
+            'background-size': '42px'
+        })
+
+        setTimeout(() => {
+            const center = q('.center .marker')
+            center.classList.remove('marker-skull')
+            center.classList.add('marker-skull-killed')
+            anime_shake(center)
+        }, 300)
+
+        setTimeout(() => {
+            anime({
+                targets: '.marker-move',
+                easing: 'easeInOutQuint',
+                duration: 900,
+                translateY: 64 + 10
+            })
+            anime({
+                targets: '.marker-expand',
+                easing: 'easeInOutQuint',
+                duration: 900,
+                translateY: 64 + 10,
+                'background-size': '64px',
+            })
+
+            anime({
+                targets: '.center .marker',
+                easing: 'easeInOutQuint',
+                duration: 900,
+                translateY: 64 + 10,
+                'background-size': '42px',
+                opacity: 0.6,
+            })
+
+        }, 600)
 
         anime({
             targets: '.sep-top',
             easing: 'linear',
-            duration: 2000,
-            translateX: -50
+            duration: 900+600,
+            translateX: -75
         })
         anime({
             targets: '.sep-bot',
             easing: 'linear',
-            duration: 2000,
-            translateX: 50
+            duration: 900+600,
+            translateX: 75
         })
 
         document.querySelector('.lvl').textContent = String(lvl - 1)
@@ -170,8 +398,6 @@ const map_preview = {
 
     }
 }
-
-
 
 
 const menu = {
@@ -293,7 +519,7 @@ const box_opener = {
             target: '.box-opener',
             easing: 'linear',
             duration: 1200,
-            'background-position':'100% 0%',
+            'background-position': '100% 0%',
             loop: true
         })
 
@@ -333,7 +559,7 @@ const box_opener = {
                 opacity: 0.0,
             })
             anime.set('.box-front', {
-                'background-image': 'url("assets/images/map_preview/chest_open.png")',
+                'background-image': 'url("assets/images/map_preview/chest_open.gif")',
                 skew: '0deg, 0deg',
                 translateX: 0
             })
@@ -342,7 +568,7 @@ const box_opener = {
                 opacity: 0.8
             })
 
-            q('.box-opener').appendChild(new_element('<div class="explosion"></div>',{
+            q('.box-opener').appendChild(new_element('<div class="explosion"></div>', {
                 'background-image': `url("assets/images/box_opener/explosion.gif")`,
             }))
 
@@ -420,7 +646,7 @@ const dev = {
         const el_weapon = q('#weapon-basic')
 
 
-        const add_weapons  = () => {
+        const add_weapons = () => {
             for (let weapon in lib_weapons)
                 el_weapon.appendChild(new_element(
                     `<option value="${weapon}">${weapon}</option>`
@@ -441,14 +667,16 @@ const dev = {
                     ))
             }
             const dev_data = extract(DevData)
-            el_common_1.value = dev_data.common_1
-            el_common_2.value = dev_data.common_2
-            el_rare.value = dev_data.rare
+            if (dev_data) {
+                el_common_1.value = dev_data.common_1
+                el_common_2.value = dev_data.common_2
+                el_rare.value = dev_data.rare
+            }
         }
 
         const dev_data = extract(DevData)
 
-        if (dev_data.is_on !== undefined) {
+        if (dev_data && dev_data.is_on !== undefined) {
             el_is_on.checked = dev_data.is_on
             el_theme.value = dev_data.theme
             el_is_gen.checked = dev_data.is_gen
@@ -474,6 +702,13 @@ const dev = {
             const rare = el_rare.value
             const weapon = el_weapon.value
 
+            if (!is_on) {
+                purge(DevData)
+                localStorage.removeItem('dev_data')
+                init_route(menu)
+                return
+            }
+
             const dev_data_new = {
                 is_on,
                 theme,
@@ -488,10 +723,10 @@ const dev = {
             )
 
             localStorage.setItem('dev_data', JSON.stringify(dev_data_new))
+            init_route(menu)
         })
     }
 }
-
 
 
 export default {

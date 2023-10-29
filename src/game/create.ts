@@ -13,7 +13,6 @@ import {
     OnBoard,
     PlayerData,
     RoundData,
-    SetupData,
     Value
 } from "./components";
 import {getRandomInt, range, shuffleArray} from "./helpers";
@@ -32,11 +31,8 @@ const mob = (variant, key, position_component=OnBoard) => {
 
     const value = 1//Math.round(getRandomInt(...value_range)  * multiplier)
 
-    const loot = world.createEntity(
-        new InLootPile(),
-        new Value(getRandomInt(3, 7)),
-        new CardType(E_CardType.coin),
-    )
+    const loot = coin()
+    loot.add(new InLootPile())
 
     const position = new position_component(key)
 
@@ -81,7 +77,7 @@ const upcoming = (data) => {
                     } = weapons_map.get(variant)
                     // const value = Math.round(getRandomInt(...value_range)  * multiplier)
 
-                    const in_crate = getRandomInt(1, 100) < 10
+                    const in_crate = getRandomInt(1, 100) < 20
 
                     const location = in_crate ? new InLootPile() : new InUpcomingPile(card_n)
 
@@ -175,15 +171,19 @@ const hand = () => {
         new CardType(E_CardType.weapon),
         new CardVariant('sword'),
     )
+    return
+    world.createEntity(
+        new InHand(1),
+        new Value(50),
+        new CardType(E_CardType.weapon),
+        new CardVariant(weapon),
+    )
 }
 
 const godlike = (run_data) => {
 
     world.createEntity(
         new GodLike(),
-        new SetupData({
-            turns: 25
-        }),
         new RoundData({
             turn: 0
         }),
@@ -192,7 +192,7 @@ const godlike = (run_data) => {
             hp: run_data.player.hp,
             coins: 0,
             swipe_points: 0,
-            swipe_points_max: 3
+            swipe_points_max: 1
         })
     )
 }

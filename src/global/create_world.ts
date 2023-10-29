@@ -6,10 +6,9 @@ const create_world_global = () => {
     const world = new World()
     const god_like = world.createEntity(new GodLike())
 
-    const dev_data = JSON.parse(localStorage.getItem('dev_data')) || {}
-    console.log(dev_data)
-
-    god_like.add(new DevData(dev_data))
+    const dev_data = JSON.parse(localStorage.getItem('dev_data'))
+    if (dev_data)
+        god_like.add(new DevData(dev_data))
 
 
     for (let spell of Object.keys(lib_spells)) {
@@ -33,7 +32,11 @@ export const purge = (component) => {
 }
 
 export const extract = (component) => {
-    return world_global.qo(component).get(component)
+    try {
+        return world_global.qo(component).get(component)
+    } catch (e) {
+        return undefined
+    }
 }
 
 

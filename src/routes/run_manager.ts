@@ -5,9 +5,10 @@ import {one_v2} from "../game/rng";
 import {show_debug_data} from "../debug";
 import {init_route} from "../routing";
 import routes from "../routes";
-import {lib_mobs, lib_themes} from "../global/libs";
+import {lib_mobs, lib_themes, lib_weapons} from "../global/libs";
 
 
+// generate a set of cards
 const test_gen_one = () => {
     const mul_by_variant = {
         'mace': 4,
@@ -15,16 +16,16 @@ const test_gen_one = () => {
         'sword': 1
     }
 
-    // const amounts: any[] = [
-    //     ['mob', 47 - 0],
-    //     ['food', 13],
-    //     ['weapon', 15 + 0]
-    // ]
     const amounts: any[] = [
-        ['mob', 5],
-        ['food', 5],
-        ['weapon', 2]
+        ['mob', 46],
+        ['food', 13],
+        ['weapon', 16]
     ]
+    // const amounts: any[] = [
+    //     ['mob', 3],
+    //     ['food', 3],
+    //     ['weapon', 3]
+    // ]
 
     const sum = {
         mob: 0,
@@ -52,6 +53,7 @@ const test_gen_one = () => {
     return {cards, percent: {bad_percent, good_percent}}
 }
 
+// generate a set of cards with certain bad/good ration
 const test_gen = (target = 0.48) => {
     if (target >= 0.49)
         throw Error('Target value is unplayable')
@@ -96,12 +98,12 @@ const segments = [
             lib_mobs.frog
         ],
         mobs: {
-            common: ['spider'],
-            rare: ['rat']
+            common: [lib_mobs.hound],
+            rare: [lib_mobs.rat]
         },
         weapons: {
-            common: ['sword'],
-            rare: ['mace']
+            common: [lib_weapons.sword],
+            rare: [lib_weapons.mace]
         }
     },
     {
@@ -114,14 +116,14 @@ const segments = [
             lib_mobs.frog
         ],
         mobs: {
-            common: ['pharaoh', 'phoenix'],
-            rare: ['rat', 'worm'],
-            legend: ['dragon']
+            common: [lib_mobs.hound, lib_mobs.zombie],
+            rare: [lib_mobs.rat, lib_mobs.worm],
+            legend: [lib_mobs.dragon]
         },
         weapons: {
-            common: ['sword', 'stick'],
-            rare: ['mace', 'whip', 'scythe'],
-            legend: ['frying_pan', 'nunchaku']
+            common: [lib_weapons.sword, lib_weapons.stick],
+            rare: [lib_weapons.mace, lib_weapons.whip, lib_weapons.scythe],
+            legend: [lib_weapons.frying_pan, lib_weapons.nunchaku]
         }
     },
     {
@@ -134,14 +136,23 @@ const segments = [
             lib_mobs.skeleton
         ],
         mobs: {
-            common: ['gorilla', 'dwarf', 'worm', 'rat', 'pharaoh'],
-            rare: ['elf', 'orc', 'phoenix'],
-            legend: ['dragon', 'lych']
+            common: [lib_mobs.cyclops, lib_mobs.gorgon, lib_mobs.worm, lib_mobs.hound, lib_mobs.hound],
+            rare: [lib_mobs.ghost, lib_mobs.minotaur, lib_mobs.golem],
+            legend: [lib_mobs.dragon]
         },
         weapons: {
-            common: ['sword', 'whip'],
-            rare: ['mace', 'shovel', 'scythe', 'spear', 'rake'],
-            legend: ['frying_pan', 'katana']
+            common: [lib_weapons.sword, lib_weapons.whip],
+            rare: [
+                lib_weapons.mace,
+                lib_weapons.shovel,
+                lib_weapons.scythe,
+                lib_weapons.spear,
+                lib_weapons.rake
+            ],
+            legend: [
+                lib_weapons.frying_pan,
+                lib_weapons.katana
+            ]
         }
     },
     {
@@ -219,34 +230,29 @@ export const print_segments = () => {
 export const get_segment = (lvl) => {
     for (let segment of segments) {
         const [start, end] = segment.region
-        if (start >= lvl && lvl <= end)
+        console.log('check reg', start, lvl, end)
+        if (start <= lvl && lvl <= end)
             return segment
     }
 }
 
-export const get_run_data = () => {
-    const ent = world_global.qo(RunData)
-    if (ent === undefined)
-        return undefined
-    return ent.get(RunData)
-}
 
 const generate_probabilities_mob = (data, basic: string) => {
     const common = getRandomChoice(data.common)
     const rare = getRandomChoice(data.rare)
     if (data.legend === undefined) {
         return [
-            [50, basic],
-            [30, common],
-            [20, rare]
+            [70, basic],
+            [20, common],
+            [10, rare]
         ]
     }
 
     const legend = getRandomChoice(data.legend)
     return [
-        [50, basic],
-        [30, common],
-        [19, rare],
+        [70, basic],
+        [20, common],
+        [9, rare],
         [1, legend]
     ]
 }
@@ -303,7 +309,8 @@ const generate_cards = (current_level) => {
     }
 
 
-    console.log(mobs)
+    console.log('current_level', current_level)
+    console.log('mobs', mobs)
 
 
     const level_probabilities = new Map([
@@ -325,20 +332,11 @@ const generate_cards = (current_level) => {
     return test_gen()
 }
 
-const get_theme = (current_level) => {
-    const dd = extract(DevData)
-    console.log(dd)
-    if (dd.is_on) {
-        return dd.theme
-    } else return 'dungeon'
-}
-
-
 export const init_run = async () => {
-    const run_data = get_run_data()
+    const run_data = extract(RunData)
 
 
-    const {current_level} = run_data
+    const {current_level, theme, hp, hp_max} = run_data
 
     const cards = generate_cards(current_level)
     console.log(cards)
@@ -350,10 +348,15 @@ export const init_run = async () => {
         new LevelData({
             cards,
             player: {
-                hp: run_data.hp,
-                hp_max: run_data.hp_max
+                hp,
+                hp_max
             },
-            theme: get_theme(current_level)
+            choices: {
+                hp: 0,
+                weapon: 0,
+                heal: 0
+            },
+            theme
         }))
 
 }

@@ -24,14 +24,13 @@ export const select = (filters=undefined, pattern=undefined) => {
     } else {
         for (let pos of pattern) {
             const candidate = world.qo(new OnBoard(from_v(pos)))
-            console.log(candidate)
             if (candidate)
                 candidates.push(candidate)
         }
     }
 
 
-    if (filters) {
+    if (filters && filters.length > 0) {
         candidates = candidates.filter(ent => {
             for (let obj of filters)
                 if (obj.apply(ent)) return true

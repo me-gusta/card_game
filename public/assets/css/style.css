@@ -35,11 +35,13 @@ img {
 }
 
 .debug-data {
+  display: none;
   position: absolute;
   bottom: 40px;
   width: 100%;
 }
 .debug-ui {
+  display: none;
   position: absolute;
   bottom: 30px;
   width: 100%;
@@ -322,9 +324,16 @@ img {
   height: 85px !important;
 }
 
+.text-shadow {
+  text-shadow: black 2px 2px;
+}
+
 .bg {
   background-size: 64px;
   image-rendering: pixelated;
+}
+.bg-planks {
+  background-image: url("../images/textures/planks.png");
 }
 .bg-dungeon {
   background-image: url("../images/textures/dungeon.png");
@@ -408,8 +417,8 @@ img {
   z-index: 2;
   position: absolute;
   width: 60%;
-  height: 40%;
-  top: 30%;
+  height: 70%;
+  top: 20%;
   margin: auto;
 }
 .menu .btns {
@@ -448,15 +457,21 @@ img {
 }
 .map .header-dungeon {
   background-image: url("../images/map_preview/dungeon_header.png");
-  color: #DCE1C3;
 }
 .map .header-sea {
   background-image: url("../images/map_preview/sea_header.png");
-  color: #b7dcdf;
 }
 .map .header-hell {
   background-image: url("../images/map_preview/hell_header.png");
-  color: #e77373;
+}
+.map .color-dungeon {
+  color: #DCE1C3;
+}
+.map .color-sea {
+  color: #b7dcdf;
+}
+.map .color-hell {
+  color: #fd8484;
 }
 .map .sep-dungeon {
   background-image: url("../images/map_preview/grass.png");
@@ -468,10 +483,12 @@ img {
   background-image: url("../images/map_preview/hell_sep.png");
 }
 .map .header {
+  box-shadow: 4px 4px 8px 12px rgba(30, 30, 30, 0.3);
   width: 100%;
   height: 15%;
   background-size: 64px;
   image-rendering: pixelated;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -496,6 +513,159 @@ img {
 .map .header .sep-bot {
   bottom: -15px;
 }
+.map .footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  box-shadow: 4px 4px 8px 12px rgba(30, 30, 30, 0.3);
+}
+.map .footer .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.map .footer .letter {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  letter-spacing: 1px;
+}
+.map .footer .letter span {
+  min-height: 22px;
+}
+.map .footer .text-wrap {
+  font-size: 9px;
+}
+.map .footer .icon-wrap {
+  position: absolute;
+  right: 0;
+}
+.map .footer .bg-map-portrait {
+  image-rendering: pixelated;
+  background-size: 90px;
+  width: 70px;
+  height: 70px;
+  padding: 15px;
+  background-position: center;
+}
+.map .footer .bg-map-portrait.dungeon {
+  background-image: url("../images/box_opener/spiral2.gif");
+}
+.map .footer .bg-map-portrait.sea {
+  background-image: url("../images/box_opener/spiral2_sea.gif");
+}
+.map .footer .bg-map-portrait.hell {
+  background-image: url("../images/box_opener/spiral2_hell.gif");
+}
+.map .footer .portrait {
+  image-rendering: pixelated;
+  background-image: url("../images/portraits/Icons_01.png");
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+}
+.map .choice {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: absolute;
+  top: 15%;
+  left: 0;
+  padding: 60px;
+}
+.map .choice-heading {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+.map .choice-btns {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "a b" "c c";
+}
+.map .choice-btn {
+  background: #3b2722;
+  height: 120px;
+  width: 100%;
+  font-size: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: end;
+  position: relative;
+  background-blend-mode: multiply;
+  box-shadow: 4px 4px 5px 1px rgba(30, 30, 30, 0.9);
+  cursor: pointer;
+}
+.map .choice-btn.dungeon {
+  background: url("../images/map_preview/btn_dungeon.png"), #7fac48;
+}
+.map .choice-btn.sea {
+  background: url("../images/map_preview/btn_dungeon.png"), #48aca0;
+}
+.map .choice-btn.hell {
+  background: url("../images/map_preview/btn_dungeon.png"), #ac4857;
+}
+.map .choice-btn .icon {
+  image-rendering: pixelated;
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 50px;
+  height: 50px;
+}
+.map .choice-btn .icon-hp {
+  background-image: url("../images/map_preview/hp.png");
+}
+.map .choice-btn .icon-weapon {
+  background-image: url("../images/map_preview/smith.png");
+}
+.map .choice-btn .icon-heal {
+  background-image: url("../images/map_preview/sleep.png");
+}
+.map .choice-btn.max-hp {
+  grid-area: a;
+}
+.map .choice-btn.weapons {
+  grid-area: b;
+}
+.map .choice-btn.heal {
+  grid-area: c;
+}
+.map .rotator {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  top: 42%;
+}
+.map .rotator-inside {
+  position: relative;
+}
+.map .rotator .vertical {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  gap: 10px;
+}
+.map .rotator .vertical.top {
+  padding-bottom: 10px;
+  bottom: 100%;
+}
+.map .rotator .vertical.bottom {
+  padding-top: 10px;
+  top: 100%;
+  opacity: 0.6;
+}
 .map .m1 {
   width: 64px;
   height: 64px;
@@ -512,12 +682,20 @@ img {
 }
 .map .marker {
   image-rendering: pixelated;
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 .map .marker-skull {
   width: 64px;
   height: 64px;
   background-size: 64px;
   background-image: url("../images/map_preview/skull.png");
+}
+.map .marker-skull-killed {
+  width: 64px;
+  height: 64px;
+  background-size: 64px;
+  background-image: url("../images/map_preview/skull_killed.png");
 }
 .map .marker-chest {
   width: 100px;
@@ -605,19 +783,21 @@ img {
 }
 .box-opener .box {
   position: relative;
-  width: 220px;
+  width: 200px;
   height: 140px;
   z-index: 3;
 }
 .box-opener .box .sprite {
-  background-size: cover;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
   image-rendering: pixelated;
   position: absolute;
 }
 .box-opener .box-front {
   background-image: url("../images/map_preview/chest.png");
   z-index: 2;
-  width: 220px;
+  width: 200px;
   height: 140px;
 }
 .box-opener .explosion {
@@ -632,6 +812,10 @@ img {
 .dev .row {
   display: flex;
   gap: 15px;
+}
+
+.display-none {
+  display: none !important;
 }
 
 /*# sourceMappingURL=style.css.map */

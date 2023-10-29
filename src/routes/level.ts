@@ -205,7 +205,7 @@ const process_event = async (data) => {
     if (!can_process) return;
 
     const action = data.action
-    const key = data.key
+    const key = Number(data.key)
     const location = data.location
 
     console.log(action, location, key)
@@ -232,7 +232,6 @@ const process_event = async (data) => {
 
         console.log(is_on_swap)
 
-
         const delay = is_on_swap ? 300 : 0
 
         setTimeout(async () => {
@@ -256,7 +255,10 @@ const process_event = async (data) => {
             anim_swipe_points()
             anim_swipe(key, key_other)
 
+            actions.ensure_faded()
             await sleep(250)
+
+            anim_faded()
 
             can_process = true
         }, delay)
@@ -454,7 +456,7 @@ const check_if_finished = async () => {
     world_global.qo(GodLike).add(
         new LevelResults({
             hp: player_data.hp,
-            coins: player_data.coins + getRandomInt(57, 90)
+            coins: player_data.coins
         })
     )
     await init_route(routes.run_ender)
@@ -552,6 +554,7 @@ const move_deck = async () => {
                     if (y === max_card_y) {
                         anime.set(elem, {
                             translateY: '-130%',
+                            translateX: '0%',
                             opacity: 1,
                             scaleX: 1,
                             scaleY: 1,
@@ -567,6 +570,7 @@ const move_deck = async () => {
                     update_card(elem)
                     anime.set(elem, {
                         translateY: '0%',
+                        translateX: '0%',
                         opacity: 1,
                         scale: 1,
                         scaleX: 1,
@@ -597,14 +601,17 @@ const end_turn = async () => {
     console.log('end turn')
     actions.end_turn()
 
+    actions.remove_faded()
+    anim_faded()
+    await sleep(50)
+
     if (actions.trigger_on_end_turn()) {
         if (check_dead())
             await sleep(350 + 400)
         else
             await sleep(350)
+        console.log('epyy')
     }
-
-
 
     const pd = get_godlike.player_data()
     pd.swipe_points = pd.swipe_points_max
@@ -612,6 +619,12 @@ const end_turn = async () => {
     await move_deck()
 
     await sleep(1000)
+
+    // for (let i = 0; i < cards_amount; i++) {
+    //     anime.set('#card-' + i, {
+    //         transformX: 0
+    //     })
+    // }
 
     if (!await check_if_finished())
         await start_turn()

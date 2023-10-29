@@ -30,9 +30,6 @@ export class OnBoard extends C_Enum<number> {
 export class InHand extends C_Enum<number> {
 }
 
-export class SetupData extends C_Object<any> {
-}
-
 export class RoundData extends C_Object<any> {
 }
 

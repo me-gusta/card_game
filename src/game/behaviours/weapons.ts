@@ -19,6 +19,7 @@ import get_godlike from "../get_godlike";
 import {anim_deal_damage, anim_hero_take_damage} from "../../animations/interactions";
 import actions from "../actions";
 import {lib_spells, lib_weapons} from "../../global/libs";
+import {flip_entity} from "../../animations/flip";
 
 const calc_damage = (actor, target) => {
 
@@ -190,7 +191,12 @@ export const weapons_map = new Map([
                 if (target.has(LootId)) {
                     const loot = world.qe(target.get(LootId))
                     if (loot.get(CardType) === E_CardType.coin)
-                        loot.modify(Value).mul(10)
+                        loot.modify(Value).mul(15)
+                } else {
+                    const coin = create.coin()
+                    coin.modify(Value).mul(15)
+                    coin.add(new InLootPile())
+                    target.add(new LootId(coin.id))
                 }
             }
 
@@ -216,10 +222,12 @@ export const weapons_map = new Map([
     }],
     [lib_weapons.katana, {
         value_range: [2, 4],
-        pattern: [[1, 1], [1, 2]],
+        pattern: [[1, 0], [1, 1]],
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
-            select([], [[1, 1], [1, 2]]).forEach(ent => {
+            console.log(select([], [[1, 0], [1, 1]]))
+            select([], [[1, 0], [1, 1]]).forEach(ent => {
+                console.log('katana', ent)
                 ent.modify(Value).sub(dmg)
                 anim_deal_damage(ent)
             })
@@ -250,11 +258,17 @@ export const weapons_map = new Map([
         on_choice: (actor: Entity, target: Entity) => {
             const dmg = calc_damage(actor, target)
 
-            if (in_array([E_CardType.food, E_CardType.weapon], target.get(CardType))) {
-                const value_target = target.get(Value)
-                actor.modify(Value).sub(Math.ceil(value_target / 4))
+            if (in_array([E_CardType.food, E_CardType.weapon, E_CardType.coin], target.get(CardType))) {
+                const value_remove = actor.get(Value) / 2
+                actor.modify(Value).sub(Math.ceil(value_remove))
 
-                actions.consume_card(target.get(OnBoard))
+                const key = target.get(OnBoard)
+                actions.consume_card(key)
+
+                const coin = create.coin()
+                coin.add(new OnBoard(key))
+                flip_entity(coin)
+
             } else {
                 target.modify(Value).sub(dmg)
                 actor.modify(Value).sub(dmg)
