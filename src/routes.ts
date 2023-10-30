@@ -94,8 +94,8 @@ const run_manager = {
             world_global.qo(GodLike).add(
                 new RunData({
                     current_level: 1,
-                    hp: 20,
-                    hp_max: 20,
+                    hp: 33,
+                    hp_max: 33,
                     coins: 0,
                     theme
                 })

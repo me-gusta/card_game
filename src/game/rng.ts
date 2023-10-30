@@ -104,11 +104,11 @@ const get_map_entry = (tag, variant) => {
     }
 }
 
-export const one_v2 = (tag,) => {
+export const one_v2 = (type,) => {
     const generator_data = world_global.qo(GeneratorData).get(GeneratorData)
     const level_probabilities = generator_data.level_probabilities
     const multiplier = generator_data.multiplier
-    const probabilities = level_probabilities.get(tag)
+    const probabilities = level_probabilities.get(type)
     const dice = getRandomInt(1, 100)
     let sum = 0
     for (let [prob, variant] of probabilities) {
@@ -117,7 +117,7 @@ export const one_v2 = (tag,) => {
         if (type === undefined)
             throw `CARD "${variant}" IS UNKNOWN. PLS ADD IT TO LIBRARY`
         if (dice <= sum) {
-            const {value_range} = get_map_entry(tag, variant)
+            const {value_range} = get_map_entry(type, variant)
             const value = Math.round(
                 getRandomInt(...value_range) * multiplier
             )
