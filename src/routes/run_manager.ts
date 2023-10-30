@@ -1,6 +1,6 @@
-import {getRandomChoice, round} from "../game/helpers";
+import {getRandomChoice, getRandomInt, round, shuffleArray} from "../game/helpers";
 import {extract, purge, world_global} from "../global/create_world";
-import {DevData, GeneratorData, GodLike, LevelData, RunData} from "../game/components";
+import {CardType, DevData, E_CardType, GeneratorData, GodLike, LevelData, RunData} from "../game/components";
 import {one_v2} from "../game/rng";
 import {show_debug_data} from "../debug";
 import {init_route} from "../routing";
@@ -9,6 +9,47 @@ import {lib_mobs, lib_themes, lib_weapons} from "../global/libs";
 
 
 // generate a set of cards
+const test_gen_two = () => {
+    const amounts: any[] = [
+        [E_CardType.mob, 51],
+        [E_CardType.food, 10],
+        [E_CardType.weapon, 14]
+    ]
+
+    let goods = []
+    let bads = []
+    for (let [type, amount] of amounts) {
+        for (let i = 0; i < amount; i++) {
+            const gen = one_v2(type)
+            if (type === E_CardType.mob)
+                bads.push(gen)
+            else
+                goods.push(gen)
+        }
+    }
+    goods = shuffleArray(goods)
+    bads = shuffleArray(bads)
+    let cards = [...bads]
+    let next_div = getRandomInt(3, 4)
+    for (let i = bads.length - 1; i > 0; i--) {
+        if (i % next_div === 0) {
+            cards.splice(i, 0, goods.pop())
+            next_div = getRandomInt(3, 4)
+        }
+    }
+
+    console.log(cards, goods.length)
+    const amount = goods.length
+    for (let i =0; i < amount; i++) {
+        cards.splice(getRandomInt(0, cards.length-1), 0, goods.pop())
+        console.log('pop')
+    }
+    console.log(cards)
+
+    return {cards, percent: {bad_percent: 1, good_percent: 1}}
+}
+
+
 const test_gen_one = () => {
     const mul_by_variant = {
         'mace': 4,
@@ -33,7 +74,7 @@ const test_gen_one = () => {
         weapon: 0
     }
 
-    const cards = []
+    let cards = []
     for (let [type, amount] of amounts) {
         for (let i = 0; i < amount; i++) {
             const gen = one_v2(type)
@@ -42,6 +83,7 @@ const test_gen_one = () => {
             cards.push(gen)
         }
     }
+    cards = shuffleArray(cards)
     console.log(cards)
 
     const good = sum.food + sum.weapon
@@ -55,17 +97,17 @@ const test_gen_one = () => {
 
 // generate a set of cards with certain bad/good ration
 const test_gen = (target = 0.48) => {
-    if (target >= 0.49)
-        throw Error('Target value is unplayable')
-    const gap = 0.01
-
-    let bad_percent = 999
-    let data
-    while (bad_percent > target + gap || bad_percent < target - gap) {
-        data = test_gen_one()
-        bad_percent = target//data.percent.bad_percent
-    }
-    return data
+    // if (target >= 0.49)
+    //     throw Error('Target value is unplayable')
+    // const gap = 0.01
+    //
+    // let bad_percent = 999
+    // let data
+    // while (bad_percent > target + gap || bad_percent < target - gap) {
+    //     data = test_gen_two()
+    //     bad_percent = target//data.percent.bad_percent
+    // }
+    return test_gen_two()
 }
 
 
@@ -165,14 +207,38 @@ const segments = [
             lib_mobs.skeleton
         ],
         mobs: {
-            common: ['gorilla', 'dwarf', 'worm', 'rat', 'pharaoh'],
-            rare: ['elf', 'orc', 'phoenix', 'golem'],
-            legend: ['lych', 'necromancer']
+            common: [
+                lib_mobs.cyclops,
+                lib_mobs.gorgon,
+                lib_mobs.worm,
+                lib_mobs.rat,
+                lib_mobs.hound
+            ],
+            rare: [
+                lib_mobs.ghost,
+                lib_mobs.minotaur,
+                lib_mobs.zombie,
+                lib_mobs.golem],
+            legend: [
+                lib_mobs.death,
+                lib_mobs.necromancer
+            ]
         },
         weapons: {
-            common: ['sword', 'mace', 'shuriken'],
-            rare: ['dagger', 'crowbar', 'nunchaku'],
-            legend: ['knuckles', 'katana']
+            common: [
+                lib_weapons.sword,
+                lib_weapons.mace,
+                lib_weapons.shuriken
+            ],
+            rare: [
+                lib_weapons.dagger,
+                lib_weapons.crowbar,
+                'nunchaku'
+            ],
+            legend: [
+                lib_weapons.knuckles,
+                lib_weapons.katana
+            ]
         }
     },
     {
@@ -185,14 +251,41 @@ const segments = [
             lib_mobs.headless
         ],
         mobs: {
-            common: ['golem', 'dwarf', 'worm', 'rat', 'phoenix'],
-            rare: ['elf', 'orc', 'pharaoh', 'gorilla', 'dragon'],
-            legend: ['lych', 'necromancer']
+            common: [
+                lib_mobs.golem,
+                lib_mobs.gorgon,
+                lib_mobs.worm,
+                lib_mobs.rat,
+                lib_mobs.zombie
+            ],
+            rare: [
+                lib_mobs.ghost,
+                lib_mobs.minotaur,
+                lib_mobs.hound,
+                lib_mobs.cyclops,
+                lib_mobs.dragon
+            ],
+            legend: [
+                lib_mobs.death,
+                lib_mobs.necromancer
+            ]
         },
         weapons: {
-            common: ['whip', 'mace', 'dagger'],
-            rare: ['shuriken', 'shovel', 'spear', 'crowbar'],
-            legend: ['knuckles', 'rake']
+            common: [
+                lib_weapons.whip,
+                lib_weapons.mace,
+                lib_weapons.dagger
+            ],
+            rare: [
+                lib_weapons.shuriken,
+                lib_weapons.shovel,
+                lib_weapons.spear,
+                lib_weapons.crowbar
+            ],
+            legend: [
+                lib_weapons.knuckles,
+                lib_weapons.rake
+            ]
         }
     },
     {
@@ -205,14 +298,42 @@ const segments = [
             lib_mobs.headless
         ],
         mobs: {
-            common: ['golem', 'dwarf', 'worm', 'pharaoh', 'lych'],
-            rare: ['devil', 'orc', 'pharaoh', 'rat', 'golem'],
-            legend: ['necromancer', 'dragon']
+            common: [
+                lib_mobs.golem,
+                lib_mobs.gorgon,
+                lib_mobs.worm,
+                lib_mobs.hound,
+                lib_mobs.death
+            ],
+            rare: [
+                'devil',
+                lib_mobs.minotaur,
+                lib_mobs.hound,
+                lib_mobs.rat,
+                lib_mobs.golem
+            ],
+            legend: [
+                lib_mobs.necromancer,
+                lib_mobs.dragon
+            ]
         },
         weapons: {
-            common: ['whip', 'mace', 'spear'],
-            rare: ['shuriken', 'shovel', 'dagger', 'crowbar', 'katana'],
-            legend: ['knuckles', 'rake']
+            common: [
+                lib_weapons.whip,
+                lib_weapons.mace,
+                lib_weapons.spear
+            ],
+            rare: [
+                lib_weapons.shuriken,
+                lib_weapons.shovel,
+                lib_weapons.dagger,
+                lib_weapons.crowbar,
+                lib_weapons.katana
+            ],
+            legend: [
+                lib_weapons.knuckles,
+                lib_weapons.rake
+            ]
         }
     },
 ]
@@ -305,7 +426,7 @@ const generate_cards = (current_level) => {
         ]
     } else {
         prob_mobs = generate_probabilities_mob(mobs, getRandomChoice(mobs_basic))
-        prob_weapons = generate_probabilities_weapon(weapons, 'sword')
+        prob_weapons = generate_probabilities_weapon(weapons, lib_weapons.sword)
     }
 
 

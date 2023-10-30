@@ -115,7 +115,6 @@ const init_on_swap = (cardA, cardB) => {
 
     if (cardA.get(OnSwap)) {
         const {on_swap} = mobs_map.get(cardA.get(CardVariant))
-        console.log(on_swap.toString(), cardA.get(CardVariant))
         on_swap(cardA, cardB)
         return true
     }

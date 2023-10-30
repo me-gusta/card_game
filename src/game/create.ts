@@ -56,7 +56,7 @@ const coin = () => {
 
 const upcoming = (data) => {
     console.log(data)
-    const cards = shuffleArray(data.cards)
+    const cards = data.cards
     for (let y of range(cards.length / 3))
         for (let x of range(3)) {
 
