@@ -523,7 +523,7 @@ const flip_all = async () => {
     }
 }
 
-const move_deck = async () => {
+const move_deck2 = async () => {
 
     for (let x = 2; x >= 0; x--) {
         actions.consume_card(x)
@@ -592,6 +592,128 @@ const move_deck = async () => {
 
 
         }
+    })
+}
+
+
+const move_deck = async () => {
+
+    for (let x = 2; x >= 0; x--) {
+        actions.consume_card(x)
+        await sleep(255)
+
+    }
+
+    for (let y = 1; y < 4; y++) {
+        for (let x = 0; x < 3; x++) {
+            actions.move_down_on_board(v(x, y))
+        }
+    }
+    await sleep(200)
+
+    const margin = q('#card-0').getBoundingClientRect().height
+    console.log(margin)
+
+    for (let y = 0; y < (cards_amount / 3); y++) {
+        for (let x = 0; x < 3; x++) {
+            const elem = document.querySelector('#card-' + from_v([x, y]))
+            const opacity = y === max_card_y ? 0 : 1
+            anime.set(elem, {
+                translateX: '0%',
+                opacity: opacity,
+                scaleX: 1,
+                scaleY: 1,
+                scale: 1,
+            })
+            continue
+            if (y === 0) {
+                anime.set(elem, {
+                    translateY: '-330%',
+                    translateX: '0%',
+                    opacity: 1,
+                    scaleX: 1,
+                    scaleY: 1,
+                    scale: 1,
+                })
+
+                anime.set(elem.parentElement, {
+                    'z-index': 210
+                })
+                continue
+            }
+        }
+    }
+
+    anime.set('.board', {
+        translateY: -margin - 10
+    })
+
+    // for (let x = 0; x < 3; x++) {
+    //     actions.add_new_on_board(v(x, max_card_y))
+    //     const elem = document.querySelector('#card-' + from_v([x, max_card_y]))
+    //     update_card(elem)
+    // }
+
+    for (let y = 0; y < (cards_amount / 3); y++) {
+        for (let x = 0; x < 3; x++) {
+            if (y === max_card_y)
+                actions.add_new_on_board(v(x, max_card_y))
+            const elem = document.querySelector('#card-' + from_v([x, y]))
+            update_card(elem)
+            anime.set(elem, {
+                translateY: '0%',
+                translateX: '0%',
+                scale: 1,
+                scaleX: 1,
+                scaleY: 1,
+            })
+            // anime.set('.board', {
+            //     translateY: '0%',
+            // })
+        }
+    }
+    // return
+
+    const after = async () => {
+        for (let y = 0; y < (cards_amount / 3); y++) {
+            for (let x = 0; x < 3; x++) {
+                const elem = document.querySelector('#card-' + from_v([x, y]))
+                update_card(elem)
+                anime.set(elem, {
+                    translateY: '0%',
+                    translateX: '0%',
+                    opacity: 1,
+                    scale: 1,
+                    scaleX: 1,
+                    scaleY: 1,
+                })
+                anime.set('.board', {
+                    translateY: '0%',
+                })
+            }
+        }
+        return
+
+
+
+
+    }
+
+    anime({
+        targets: '.card-board',
+        easing: 'easeOutSine',
+        // translateY: '30%',
+        opacity: 1,
+        duration: 100,
+        // complete: after
+    })
+
+    anime({
+        targets: '.board',
+        easing: 'easeOutBack',
+        translateY: 0,
+        duration: 300,
+        // complete: after
     })
 }
 

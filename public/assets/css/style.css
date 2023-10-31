@@ -78,6 +78,7 @@ img {
   justify-content: space-between;
   font-family: "pixel", sans-serif;
   color: #f1f6f0;
+  z-index: 110;
 }
 .level .header .group-coins {
   display: flex;

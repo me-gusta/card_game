@@ -171,6 +171,18 @@ const hand = () => {
         new CardType(E_CardType.weapon),
         new CardVariant('sword'),
     )
+    world.createEntity(
+        new InHand(1),
+        new Value(5),
+        new CardType(E_CardType.weapon),
+        new CardVariant('sword'),
+    )
+    world.createEntity(
+        new InHand(2),
+        new Value(5),
+        new CardType(E_CardType.weapon),
+        new CardVariant('sword'),
+    )
     return
     world.createEntity(
         new InHand(1),

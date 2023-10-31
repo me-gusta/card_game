@@ -124,7 +124,7 @@ export const anim_fade_card = (ent) => {
     anime({
         targets: card,
         duration: 200,
-        easing: 'easeOutQuad',
+        easing: 'easeOutSine',
         opacity: 0,
         scale: 0.6
     })
@@ -156,8 +156,8 @@ export const anim_new_weapon = (key) => {
     const card = '#card-hand' + key
     anime({
         targets: card,
-        duration: 100,
-        easing: 'easeOutQuad',
+        duration: 50,
+        easing: 'easeOutSine',
         opacity: 1,
         scale: 1,
     })
@@ -171,7 +171,7 @@ export const anim_weapon_exit = (key) => {
     anime({
         targets: card,
         duration: 100,
-        easing: 'easeOutQuad',
+        easing: 'easeOutSine',
         translateX: '-200%'
         // opacity: 1,
         // scale: 1,
@@ -185,7 +185,7 @@ export const anim_weapon_move = (key) => {
     anime({
         targets: card,
         duration: 100,
-        easing: 'easeOutQuad',
+        easing: 'easeOutSine',
         translateX: '-110%'
     })
 }

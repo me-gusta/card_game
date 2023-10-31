@@ -100,6 +100,34 @@ const consume_card = (on_board_id: number) => {
 
             let in_hand_id = in_hand.length
             if (in_hand.length === 3) {
+                // START IF 3
+                for (let i = 0; i < in_hand.length; i++) {
+                    // remove hand selection
+                }
+
+                const elem_first = q('#card-hand0')
+                const scale = anime.get(elem_first, 'scale')
+
+                const elem_fantom = elem_first.cloneNode(true)
+                elem_fantom.id = 'card-hand-appendix'
+                const rect = elem_first.getBoundingClientRect()
+
+                const size = Math.floor(rect.width / scale)
+                console.log(rect, scale, Math.floor(rect.width / scale))
+                anime.set(elem_fantom, {
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    position: 'absolute',
+                    left: `-${size}px`,
+                    top: 0,
+                    scale: 1,
+                })
+                q('.hand').appendChild(elem_fantom)
+
+                anime.set('.hand', {
+                    translateX: size
+                })
+                return
                 for (let i = 0; i < in_hand.length; i++) {
                     const card_in_hand = in_hand[i]
                     if (i === 0) {
@@ -113,6 +141,7 @@ const consume_card = (on_board_id: number) => {
                     }
                 }
                 in_hand_id = 2
+                anim_collect_card(card)
 
                 setTimeout(() => {
                     for (let i = 0; i < in_hand.length; i++) {
@@ -120,22 +149,24 @@ const consume_card = (on_board_id: number) => {
                         update_card(elem, true)
                         if (i !== 2)
                             anime.set(elem, {
-                                translateX: 0
+                                translateX: 0,
+                                scale: 1
                             })
                     }
-                    anim_collect_card(card)
 
                     card.remove(OnBoard)
                     card.add(new InHand(in_hand_id))
-                    update_card(document.querySelector('#card-hand' + in_hand_id), true)
+                    update_card(q('#card-hand' + in_hand_id), true)
 
-                    anime.set('#card-hand' + 2, {
+                    anime.set('#card-hand' + in_hand_id, {
                         translateX: 0,
                         opacity: 0
                     })
-                    anim_new_weapon(2)
+                    anim_new_weapon(in_hand_id)
 
-                }, 110)
+                }, 105)
+                // END IF 3
+
             } else {
                 // if (in_hand.length === 2) {
                 //     const a = in_hand[0].get(InHand)

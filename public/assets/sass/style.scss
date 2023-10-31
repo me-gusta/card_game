@@ -105,6 +105,7 @@ $header_height: 43px;
     //padding: 0 20px;
     font-family: "pixel", sans-serif;
     color: $header_color;
+    z-index: 110;
 
     .group-coins {
       display: flex;
