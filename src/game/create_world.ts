@@ -1,4 +1,4 @@
-import {World} from "../esc/world";
+import {World} from "../ecw/world";
 
 export let world = new World()
 

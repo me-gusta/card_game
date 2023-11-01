@@ -2,7 +2,7 @@
 // on_swipe
 // on_consume
 
-import type {Entity} from "../../esc/entity";
+import type {Entity} from "../../ecw/entity";
 import get_godlike from "../get_godlike";
 import {
     CARD_TYPE_VALUABLE,

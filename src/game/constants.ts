@@ -1,4 +1,4 @@
-import {Vector} from "../esc/vector";
+import {Vector} from "../ecw/vector";
 
 export let WIDTH = 420
 export let HEIGHT = 650

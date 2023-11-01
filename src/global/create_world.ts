@@ -1,4 +1,4 @@
-import {World} from "../esc/world";
+import {World} from "../ecw/world";
 import {CardType, CardVariant, DevData, E_CardType, GodLike, SpellLib} from "../game/components";
 import {lib_spells} from "./libs";
 

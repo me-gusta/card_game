@@ -1,4 +1,4 @@
-import {C_Enum, C_Immutable, C_Object, C_Tag} from "../esc/component";
+import {C_Enum, C_Immutable, C_Object, C_Tag} from "../ecw/component";
 
 
 export class GodLike extends C_Tag {

@@ -1,4 +1,4 @@
-import {Vector} from "../esc/vector";
+import {Vector} from "../ecw/vector";
 import anime from "animejs/lib/anime.es.js";
 import {extract_digits} from "./helpers";
 

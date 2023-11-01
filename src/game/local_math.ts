@@ -1,7 +1,7 @@
-import {Vector} from "../esc/vector";
+import {Vector} from "../ecw/vector";
 import {world} from "./create_world";
 import {CardVariant, OnBoard} from "./components";
-import type {Entity} from "../esc/entity";
+import type {Entity} from "../ecw/entity";
 
 export const v = (x, y) => new Vector(x, y)
 

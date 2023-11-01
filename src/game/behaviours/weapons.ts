@@ -1,4 +1,4 @@
-import type {Entity} from "../../esc/entity";
+import type {Entity} from "../../ecw/entity";
 import {CardType, CardVariant, E_CardType, InLootPile, LootId, OnBoard, Value} from "../components";
 import {
     pattern_around,

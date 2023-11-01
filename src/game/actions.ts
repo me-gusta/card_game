@@ -10,7 +10,7 @@ import {
     Value,
 } from "./components";
 import get_godlike from "./get_godlike";
-import {Vector} from "../esc/vector";
+import {Vector} from "../ecw/vector";
 import {weapons_map} from "./behaviours/weapons";
 import {in_array} from "./helpers";
 import {mobs_map} from "./behaviours/mobs";

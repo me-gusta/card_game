@@ -1,5 +1,5 @@
-import type {IPoint} from "../esc/vector";
-import {Vector} from "../esc/vector";
+import type {IPoint} from "../ecw/vector";
+import {Vector} from "../ecw/vector";
 
 export function getRandomInt(min: number, max: number) {
     min = Math.ceil(min)
