@@ -2,9 +2,6 @@
 import {C_Enum, Component} from "./component"
 import type {Entity, EntityId} from "./entity"
 import type {System} from "./system"
-import type {TimerConfig} from "./timer";
-import {Timer} from "./timer";
-import type {ConcentratorConfig} from "./concentrator";
 import {clamp, hashCode} from "../game/helpers";
 
 export class World {
@@ -18,7 +15,6 @@ export class World {
     // _events: Map<string, any>
     _ticks: number
     _elapsed_ms: number
-    _timers: Map<EntityId, Map<any, Timer>>
     _concentrators: Map<EntityId, Map<any, any>>
 
     constructor() {
@@ -31,7 +27,6 @@ export class World {
         // this._events = new Map()
         this._ticks = 0
         this._elapsed_ms = 0
-        this._timers = new Map()
         this._concentrators = new Map()
         // this._queryOneComponentCache = new Map()
         return this
@@ -64,7 +59,6 @@ export class World {
                 }
             }
 
-            this._timers.delete(ent)
             // delete entity
             this._entities.delete(ent)
         }
@@ -205,8 +199,7 @@ export class World {
         if (typeof entity == 'number') {
             entity_id = entity
             ent = {
-                id: entity_id,
-                timer: this.getTimer(entity_id)
+                id: entity_id
             }
             ent['has'] = this.has(ent)
             ent['add'] = this.add(ent)
@@ -317,78 +310,10 @@ export class World {
         }
     }
 
-    getTimer(ent_id: EntityId) {
-        return (label: any, cfg?: TimerConfig) => {
-            let entity_timers = this._timers.get(ent_id)
-            let timer: Timer
-            if (entity_timers === undefined) {
-                if (cfg == undefined) {
-                    return
-                }
-                timer = new Timer(this._elapsed_ms, cfg)
-                entity_timers = new Map()
-                entity_timers.set(label, timer)
-                this._timers.set(ent_id, entity_timers)
-            } else {
-                timer = entity_timers.get(label)
-
-                if (timer === undefined) {
-                    if (cfg == undefined) {
-                        return
-                    }
-                    timer = new Timer(this._elapsed_ms, cfg)
-                    entity_timers.set(label, timer)
-                }
-            }
-            if (cfg !== undefined) {
-                if (cfg.duration) {
-                    timer.duration = cfg.duration
-                }
-                timer.tick(this._elapsed_ms, cfg.on_tick, cfg.on_fire)
-            }
-
-            return timer
-        }
-    }
-
-    getConcentrator(ent_id: EntityId) {
-        return (cfg: ConcentratorConfig) => {
-            const hash_f = hashCode(cfg.f.toString())
-            let concentrators_ent = this._concentrators.get(ent_id)
-            let concentrator_data
-
-            if (concentrators_ent === undefined) {
-                concentrator_data = {started_at: this._elapsed_ms, tick_previous: this._ticks - 1}
-                concentrators_ent = new Map([
-                    [hash_f, concentrator_data]
-                ])
-                this._concentrators.set(ent_id, concentrators_ent)
-            } else {
-                concentrator_data = concentrators_ent.get(hash_f)
-                if (concentrator_data === undefined) {
-                    concentrator_data = {started_at: this._elapsed_ms, tick_previous: this._ticks - 1}
-                    concentrators_ent.set(hash_f, concentrator_data)
-                }
-            }
-
-            if (concentrator_data.tick_previous + 1 !== this._ticks) {
-                concentrator_data.started_at = this._elapsed_ms
-            }
-
-            const time_passed = this._elapsed_ms - concentrator_data.started_at
-            const percent = clamp(0, 1, time_passed / cfg.duration)
-            cfg.f(percent)
-            concentrator_data.tick_previous = this._ticks
-            return percent === 1
-        }
-    }
-
 
     buildEntity(types: (typeof Component<any> | Component<any>)[], result) {
         const ent = {
             id: result[0],
-            timer: this.getTimer(result[0]),
-            concentrator: this.getConcentrator(result[0])
         }
         ent['has'] = this.has(ent)
         ent['add'] = this.add(ent)
