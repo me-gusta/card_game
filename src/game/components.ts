@@ -1,4 +1,4 @@
-import {C_Enum, C_Immutable, C_Object, C_Tag} from "../ecw/component";
+import {C_Enum, C_Primitive, C_Object, C_Tag} from "../ecw/component";
 
 
 export class GodLike extends C_Tag {
@@ -37,14 +37,14 @@ export class PlayerData extends C_Object<any> {
 }
 
 
-export class LootId extends C_Immutable<number> {
+export class LootId extends C_Primitive<number> {
 }
 
-export class EffectPoisoned extends C_Immutable<number> {
+export class EffectPoisoned extends C_Primitive<number> {
 
 }
 
-export class Value extends C_Immutable<number> {
+export class Value extends C_Primitive<number> {
 }
 
 export enum E_CardType {

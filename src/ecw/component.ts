@@ -34,7 +34,7 @@ export class C_Enum<T> extends Component<T> {
 
 }
 
-export class C_Immutable<T> extends Component<T> {
+export class C_Primitive<T> extends Component<T> {
 
 }
 
