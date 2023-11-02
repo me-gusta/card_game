@@ -6,9 +6,9 @@ focuses systems without a real-time update loop.
 
 ## Why
 
-This project started as an implementation of
+This project started as an ordinary implementation of
 ECS pattern but evolved into an attempt to make ECS 
-design pattern suitable to turn-based games.
+design pattern suitable for turn-based games.
 
 Goals:
 1. Make system so that code modification doesn't lead to rewriting any abstraction
