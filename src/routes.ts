@@ -302,6 +302,9 @@ const map_preview = {
             </div>
         </div>`,
     init: async () => {
+        const skip = true
+        if (skip)
+            return
         console.log('RUN MAP PREVIEW')
         const rd = world_global.qo(GodLike).get(RunData)
         console.log(rd)
@@ -393,7 +396,6 @@ const map_preview = {
 
         document.querySelector('.lvl').textContent = String(lvl)
         await sleep(1000)
-        // await init_route(run_manager)
 
 
     }

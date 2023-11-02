@@ -25,13 +25,15 @@ import create from "../game/create";
 import anime from "animejs/lib/anime.es";
 import {mobs_map} from "../game/behaviours/mobs";
 import get_godlike from "../game/get_godlike";
-import {touch_end, touch_move, touch_start} from "../animations/card_movement";
+import {remove_active_elem, touch_end, touch_move, touch_start} from "../animations/card_movement";
 import {from_v, to_v, v} from "../game/local_math";
 import {weapons_map} from "../game/behaviours/weapons";
 import {anim_use_card} from "../animations/interactions";
 import {extract, world_global} from "../global/create_world";
 import {init_route} from "../routing";
 import routes from "../routes";
+import {Draggable} from '@shopify/draggable';
+import {Vector} from "../esc/vector";
 
 const cards_amount = 12 - 3
 const max_card_y = cards_amount / 3 - 1
@@ -365,9 +367,9 @@ export const create_card = (cfg: { i, ent?, no_events?, transparent? }) => {
     })
 
     if (!no_events) {
-        card.ontouchend = touch_end(card, card_event(card))
-        card.ontouchstart = touch_start(card)
-        card.ontouchmove = touch_move(card)
+        // card.ontouchend = touch_end(card, card_event(card))
+        // card.ontouchstart = touch_start(card)
+        // card.ontouchmove = touch_move(card)
     }
 
     const side = new_element(`<div class="card-side"></div>`, {
@@ -759,6 +761,45 @@ export const run_level = async () => {
 
     create_board()
     create_hand()
+
+    const draggable = new Draggable(document.querySelector('.level'), {
+        draggable: '.card',
+    })
+    draggable.removePlugin(Draggable.Plugins.Mirror)
+    console.log(draggable)
+    draggable.on('drag:start', (e: any) => {
+        const data = e.data.sensorEvent.data
+        const elem = data.originalSource
+        const pos = Vector.new(data.clientX, data.clientY)
+        touch_start(elem)(pos)
+    })
+    draggable.on('drag:move', (e: any) => {
+        const find_card = (element) => {
+            if (element == null)
+                return undefined
+            let i = 4
+            while (i > 0) {
+                if (element.classList.contains('card'))
+                    return element
+                element = element.parentElement
+                if (element == null)
+                    return undefined
+            }
+            return undefined
+        }
+        const data = e.data.sensorEvent.data
+        const elem = find_card(data.target)
+        if (elem === undefined) {
+            remove_active_elem()
+            return
+        }
+        const pos = Vector.new(data.clientX, data.clientY)
+        touch_move(elem)(pos)
+    })
+    draggable.on('drag:stop', (e: any) => {
+        const elem = e.data.originalSource
+        touch_end(elem, card_event(elem))()
+    })
 
     await flip_all()
     await start_turn()

@@ -3,8 +3,7 @@
 ECW stands for Entity-Component-World. It's based on ECS but
 focuses systems without a real-time update loop.
 
-Game is available here (mobile screen or touch emulation only):
-
+Demo is available here:
 https://game-preview-85dfd.web.app/
 
 ## Why
