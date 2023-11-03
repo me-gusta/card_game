@@ -198,7 +198,11 @@ export const anim_deal_damage = (ent) => {
     console.log(card, ent.get(Value))
     console.log()
     const element_value = card.querySelector('.card-value')
-    element_value.textContent = ent.get(Value)
 
-    anim_bounce_card(card.querySelector('.card-value'))
+    console.log(document.querySelector("#card-"+ key + " .card-value"))
+    anime.set(document.querySelectorAll("#card-"+ key + " .card-value"), {
+        innerHTML: ent.get(Value),
+    });
+
+    anim_bounce_card(card)
 }
