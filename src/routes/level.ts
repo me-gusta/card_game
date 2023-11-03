@@ -764,6 +764,7 @@ export const run_level = async () => {
 
     const draggable = new Draggable(document.querySelector('.level'), {
         draggable: '.card',
+        delay: 0
     })
     draggable.removePlugin(Draggable.Plugins.Mirror)
     console.log(draggable)
