@@ -33,7 +33,7 @@ import {extract, world_global} from "../global/create_world";
 import {init_route} from "../routing";
 import routes from "../routes";
 import {Draggable} from '@shopify/draggable';
-import {Vector} from "../esc/vector";
+import {Vector} from "../ecw/vector";
 
 const cards_amount = 12 - 3
 const max_card_y = cards_amount / 3 - 1
