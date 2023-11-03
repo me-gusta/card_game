@@ -1,8 +1,18 @@
-import {run_level} from "./routes/level"
+import {create_card, run_level} from "./routes/level"
 import {init_route} from "./routing"
 import {get_segment, init_run, print_segments} from "./routes/run_manager"
-import {world} from "./game/create_world"
-import {DevData, GodLike, LevelData, LevelResults, RunData} from "./game/components"
+import {recreate_world, world} from "./game/create_world"
+import {
+    CardType,
+    CardVariant,
+    DevData,
+    GodLike,
+    LevelData,
+    LevelResults,
+    OnBoard,
+    RunData,
+    Value
+} from "./game/components"
 import {extract, purge, set_single, world_global} from "./global/create_world"
 import {new_element, q, sleep} from "./animations/helpers"
 import {deck} from "./routes/deck"
@@ -11,6 +21,8 @@ import {lib_mobs, lib_weapons, mobs_by_theme} from "./global/libs"
 import Typed from 'typed.js';
 import {getRandomChoice} from "./game/helpers";
 import {anime_shake} from "./animations/interactions";
+import {World} from "./ecw/world";
+import {update_card} from "./animations/flip";
 
 const level = {
     content: `
@@ -106,6 +118,83 @@ const run_manager = {
 
         await init_run()
         await init_route(level)
+    }
+}
+
+const dev_level = {
+    content: `
+<div class="wrap dev-level bg bg-dungeon">
+    <div class="scrollable">
+        <div class="board"></div>
+    </div>
+    <div class="buttons bg bg-dungeon">
+        <div class="btn prev">prev</div>
+        <div class="lvl-counter"></div>
+        <div class="btn next">next</div>
+        <div class="btn exit">x</div>
+    </div>
+</div>`,
+    init: async () => {
+        set_single(
+            new RunData({
+                current_level: 1,
+                hp: 33,
+                hp_max: 33,
+                coins: 0,
+                theme: 'dungeon'
+            })
+        )
+        await init_run()
+
+        recreate_world()
+        const board = document.querySelector('.board')
+        const rd = extract(RunData)
+        const ld = extract(LevelData)
+        const cards = [...ld.cards.cards]
+        cards.reverse()
+
+        console.log(rd)
+        console.log(ld)
+        q('.lvl-counter').textContent = rd.current_level
+        let i = 0
+        for (let card of cards) {
+            world.createEntity(
+                new OnBoard(i),
+                new CardType(card.type),
+                new CardVariant(card.variant),
+                new Value(card.value)
+            )
+            const elem = create_card({
+                i: i++,
+            })
+            board.appendChild(
+                elem
+            )
+            update_card(elem.firstElementChild)
+        }
+        q('.scrollable').scrollTop = q('.scrollable').scrollHeight;
+
+        q('.prev').onclick = async () => {
+            if (rd.current_level !==1) {
+                rd.current_level -= 1
+                await remake()
+            }
+        }
+
+        q('.next').onclick = async () => {
+            rd.current_level += 1
+            await remake()
+        }
+        q('.exit').onclick = async () => {
+            await init_route(menu)
+        }
+
+        const remake = async () => {
+
+            await init_run()
+            await init_route(dev_level)
+        }
+
     }
 }
 
@@ -215,10 +304,10 @@ letters.sort((a, b) => b.length - a.length)
 // letters = letters.slice(0, 6)
 
 const set_type_anim = () => {
-    const strings = [getRandomChoice(letters),getRandomChoice(letters),getRandomChoice(letters)]
+    const strings = [getRandomChoice(letters), getRandomChoice(letters), getRandomChoice(letters)]
     const type_speed = 50
     let delay = 0
-    for (let i = 0 ; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
         const str = strings[i]
         setTimeout(() => {
             new Typed(`.letter-${i}`, {
@@ -381,13 +470,13 @@ const map_preview = {
         anime({
             targets: '.sep-top',
             easing: 'linear',
-            duration: 900+600,
+            duration: 900 + 600,
             translateX: -75
         })
         anime({
             targets: '.sep-bot',
             easing: 'linear',
-            duration: 900+600,
+            duration: 900 + 600,
             translateX: 75
         })
 
@@ -428,6 +517,7 @@ const menu = {
         
         <div class="dev-btns">
             <button class="dev-btn">меню разработчика</button>        
+            <button class="dev-btn-level">проверить генератор</button>        
         </div>
     </div>
     `,
@@ -459,6 +549,9 @@ const menu = {
         })
         q('.dev-btn').addEventListener('click', async () => {
             await init_route(dev)
+        })
+        q('.dev-btn-level').addEventListener('click', async () => {
+            await init_route(dev_level)
         })
 
         let touchstartX = 0
@@ -739,5 +832,6 @@ export default {
     map_preview,
     deck,
     box_opener,
-    dev
+    dev,
+    dev_level
 }

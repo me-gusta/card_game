@@ -194,6 +194,11 @@ export const anim_weapon_move = (key) => {
 export const anim_deal_damage = (ent) => {
     const key = ent.get(OnBoard)
     const card = q('#card-' + key)
-    anim_bounce_card(card)
-    card.querySelector('.card-value').textContent = ent.get(Value)
+    console.log('anim_deal_damage')
+    console.log(card, ent.get(Value))
+    console.log()
+    const element_value = card.querySelector('.card-value')
+    element_value.textContent = ent.get(Value)
+
+    anim_bounce_card(card.querySelector('.card-value'))
 }

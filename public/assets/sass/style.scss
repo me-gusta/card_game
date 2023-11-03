@@ -991,3 +991,23 @@ $header_height: 43px;
 .display-none {
   display: none!important;
 }
+
+.dev-level {
+  .lvl-counter {
+    font-size: 30px;
+    color: #dbc2a3;
+  }
+  .buttons {
+    //position: absolute;
+    //bottom: 0;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 30px;
+    z-index: 20;
+  }
+  .scrollable {
+    //height: 95vh;
+    overflow: auto;
+  }
+}

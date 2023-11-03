@@ -7,7 +7,95 @@ import {init_route} from "../routing";
 import routes from "../routes";
 import {lib_mobs, lib_themes, lib_weapons} from "../global/libs";
 import {mobs_map} from "../game/behaviours/mobs";
+import {weapons_map} from "../game/behaviours/weapons";
 
+
+const w_gen = {
+    "dungeon": [
+        {
+            "stick": 1,
+            "mace": 2,
+            "whip": 1,
+            "scythe": 2,
+        },
+        {
+            "mace": 1,
+            "whip": 2,
+            "scythe": 2,
+            "frying_pan": 1,
+        },
+        {
+            "mace": 1,
+            "whip": 3,
+            "scythe": 2,
+            "nunchaku": 1
+        },
+        {
+            "mace": 2,
+            "whip": 1,
+            "scythe": 2,
+        }
+    ]
+}
+
+const m_gen = [
+    {
+        "basic": {
+            "spider": "70",
+            "frog": "20",
+            "bat": "10"
+        },
+        "special": {
+            "hound": "65",
+            "zombie": "",
+            "rat": "35",
+            "worm": "",
+            "dragon": ""
+        }
+    },
+    {
+        "basic": {
+            "spider": "85",
+            "frog": "15",
+            "bat": ""
+        },
+        "special": {
+            "hound": "50",
+            "zombie": "2",
+            "rat": "48",
+            "worm": "",
+            "dragon": ""
+        }
+    },
+    {
+        "basic": {
+            "spider": "85",
+            "frog": "5",
+            "bat": "10"
+        },
+        "special": {
+            "hound": "80",
+            "zombie": "10",
+            "rat": "10",
+            "worm": "",
+            "dragon": ""
+        }
+    },
+    {
+        "basic": {
+            "spider": "80",
+            "frog": "15",
+            "bat": "5"
+        },
+        "special": {
+            "hound": "70",
+            "zombie": "20",
+            "rat": "10",
+            "worm": "",
+            "dragon": ""
+        }
+    }
+]
 
 const lvls = {
     "1": {
@@ -78,7 +166,7 @@ const lvls = {
             "rat": "20",
             "worm": "20",
             "dragon": ""
-        }
+        },
     },
     "6": {
         "basic": {
@@ -125,7 +213,7 @@ const test_gen_two = () => {
     const gd = world_global.qo(GeneratorData).get(GeneratorData)
     console.log('gd', gd)
     console.log([...gd.level_probabilities.entries()])
-    const prob_mob = gd.level_probabilities.get('mob')
+    const prob_mob = getRandomChoice(m_gen)//gd.level_probabilities.get('mob')
     console.log(prob_mob)
 
     const gen = (prob_map, amount_total) => {
@@ -142,17 +230,43 @@ const test_gen_two = () => {
     const mobs = gen(prob_mob['basic'], amount_basic).concat(gen(prob_mob['special'], amount_special))
     console.log(mobs)
 
-    let goods = []
-    let bads = []
-    for (let [type, amount] of amounts.slice(1)) {
+    let weapons = []
+    const weapons_prob = getRandomChoice(w_gen['dungeon'])
+    const special_amount = Object.values(weapons_prob).reduce((a, b) => a + b)
+    const sword_amount = amounts[2][1] - special_amount
+    for (let i = 0; i < sword_amount; i++) {
+        const {value_range} = weapons_map.get('sword')
+        weapons.push({
+            type: E_CardType.weapon,
+            variant: 'sword',
+            value: getRandomInt(...value_range)
+        })
+    }
+    console.log('generated swords: ', weapons.length)
+    for (let [variant, amount] of Object.entries(weapons_prob)) {
+        // console.log(variant, amount, Object.entries(weapons_prob))
         for (let i = 0; i < amount; i++) {
-            const gen = one_v2(type)
-            if (type === E_CardType.mob)
-                bads.push(gen)
-            else
-                goods.push(gen)
+            const {value_range} = weapons_map.get(variant)
+            weapons.push({
+                type: E_CardType.weapon,
+                variant: variant,
+                value: getRandomInt(...value_range)
+            })
         }
     }
+    console.log('generated weapons: ', weapons.length)
+    console.log(weapons)
+
+    let goods = [...weapons]
+
+    let bads = []
+    for (let [type, amount] of [amounts[1]]) {
+        for (let i = 0; i < amount; i++) {
+            const gen = one_v2(type)
+            goods.push(gen)
+        }
+    }
+    console.log(goods)
     goods = shuffleArray(goods)
 
     for (let variant of mobs) {

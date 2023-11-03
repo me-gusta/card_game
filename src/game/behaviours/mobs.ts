@@ -34,11 +34,11 @@ export const mobs_map = new Map([
     [lib_mobs.spider, {
         value_range: [2, 5]
     }],
-    [lib_mobs.bat, {
-        value_range: [2, 5]
-    }],
     [lib_mobs.frog, {
-        value_range: [2, 5]
+        value_range: [3, 6]
+    }],
+    [lib_mobs.bat, {
+        value_range: [4, 7]
     }],
 
     [lib_mobs.snake, {
@@ -62,7 +62,7 @@ export const mobs_map = new Map([
         value_range: [2, 5]
     }],
     [lib_mobs.rat, {
-        value_range: [3, 8],
+        value_range: [3, 5],
         on_consume: (actor: Entity) => {
             const value = actor.get(Value)
             const godlike = get_godlike.godlike()
@@ -85,7 +85,7 @@ export const mobs_map = new Map([
         }
     }],
     [lib_mobs.hound, {
-        value_range: [5, 8],
+        value_range: [2, 5],
         triggers: [OnSwap],
         on_swap: (actor: Entity, other: Entity) => {
             half_or_kill(other)
