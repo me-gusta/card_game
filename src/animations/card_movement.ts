@@ -2,13 +2,12 @@ import {Vector} from "../ecw/vector";
 import anime from "animejs/lib/anime.es.js";
 import {extract_digits} from "./helpers";
 
-let is_moving = false
 let pos_touch_start = null
 
 const offset_max = 50
 let offset = Vector.ZERO
 
-const get_pos = (e) => Vector.new(e.touches[0].pageX, e.touches[0].pageY)
+let time = null
 
 let active_elem
 
@@ -21,6 +20,7 @@ export const remove_active_elem = () => {
         set_transform(document.querySelector('#' + active_elem), Vector.ZERO)
 
     active_elem = undefined
+    time = null
 }
 
 export const touch_start = (elem) => {
@@ -30,12 +30,12 @@ export const touch_start = (elem) => {
         console.log(elem.id)
         set_active_elem(elem.id)
         set_transform(elem, offset)
+        time = Date.now()
     }
 }
 
 export const touch_end = (elem, callback) => {
     return async () => {
-
         if (offset.length > 38) {
             const quarter = Math.PI / 4
             const angle = offset.angle()
@@ -49,8 +49,14 @@ export const touch_end = (elem, callback) => {
             } else {
                 await callback('swipe_left')
             }
-        } else if (offset.length <= 0) {
-            await callback('click')
+        } else {
+            const time_delta = Date.now() - time
+            console.log(time_delta)
+            if (time_delta >= 500) {
+                await callback('long_press')
+            } else if (offset.length <= 0) {
+                await callback('click')
+            }
         }
         pos_touch_start = null
         offset = Vector.ZERO

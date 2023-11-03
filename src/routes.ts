@@ -76,6 +76,19 @@ const level = {
                 </div>
             </div>
             <div class="hand"></div>
+            
+            <div class="wrap help">
+                <div class="help-content bg bg-clouds">
+                    <div class="help-title text-shadow">HOUND</div>
+                    <div class="help-image"></div>
+                    <div class="help-description text-shadow">
+                        This thing is absolute danger. play with fire
+                    </div>
+                    <div class="button-close">
+                        <div class="icon icon-cross"></div>
+                    </div>
+                </div>
+            </div>
 
 
         </div>`,
@@ -86,6 +99,20 @@ const level = {
 
         q('.settings').addEventListener('click', () => {
             init_route(menu)
+        })
+
+        q('.button-close').addEventListener('click', () => {
+            anime({
+                targets: '.help',
+                easing: 'easeOutSine',
+                duration: 250,
+                opacity: 0,
+                complete: () => {
+                    anime.set('.help', {
+                        display: 'none'
+                    })
+                }
+            })
         })
 
         run_level().then()
@@ -135,15 +162,17 @@ const dev_level = {
     </div>
 </div>`,
     init: async () => {
-        set_single(
-            new RunData({
-                current_level: 1,
-                hp: 33,
-                hp_max: 33,
-                coins: 0,
-                theme: 'dungeon'
-            })
-        )
+        if (extract(RunData) === undefined) {
+            world_global.qo(GodLike).add(
+                new RunData({
+                    current_level: 1,
+                    hp: 33,
+                    hp_max: 33,
+                    coins: 0,
+                    theme: 'dungeon'
+                })
+            )
+        }
         await init_run()
 
         recreate_world()
@@ -186,6 +215,7 @@ const dev_level = {
             await remake()
         }
         q('.exit').onclick = async () => {
+            purge(RunData)
             await init_route(menu)
         }
 

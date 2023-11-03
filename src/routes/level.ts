@@ -211,6 +211,41 @@ const process_event = async (data) => {
 
     console.log(action, location, key)
 
+    if (action === 'long_press') {
+        const card = world.qo(new OnBoard(key))
+        const ld = extract(LevelData)
+        const type = card.get(CardType)
+        const variant = card.get(CardVariant)
+
+        const folder = type === E_CardType.mob ? `${ld.theme}/avatar/` : ''
+        let url = `url('/assets/images/${type}/${folder}${variant}.png')`
+        let title = variant
+
+        if (type === E_CardType.crate) {
+            url = `url('/assets/images/misc/crate.png')`
+            title = 'chest'
+        } else if (type === E_CardType.coin) {
+            url = `url('/assets/images/misc/coin.png')`
+            title = 'coin'
+        }
+
+        anime.set('.help-image', {
+            'background-image': url
+        })
+        q('.help-title').innerHTML = title
+
+        anime.set('.help', {
+            display: 'flex'
+        })
+        anime({
+            targets: '.help',
+            easing: 'easeOutSine',
+            duration: 500,
+            opacity: 1
+        })
+        return
+    }
+
 
     if (action.startsWith('swipe') && location === 'board') {
 
@@ -323,10 +358,10 @@ const card_event = (elem) => {
 export const find_image = (ent, for_css = false) => {
     const folders = new Map([
         [E_CardType.food, 'food'],
-        [E_CardType.weapon, 'weapons'],
+        [E_CardType.weapon, 'weapon'],
         [E_CardType.crate, 'misc'],
         [E_CardType.coin, 'misc'],
-        [E_CardType.mob, 'mobs']
+        [E_CardType.mob, 'mob']
     ])
     const type = ent.get(CardType)
     const variant = ent.get(CardVariant)

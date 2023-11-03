@@ -340,6 +340,9 @@ img {
   background-size: 64px;
   image-rendering: pixelated;
 }
+.bg-clouds {
+  background-image: url("../images/textures/clouds.png");
+}
 .bg-planks {
   background-image: url("../images/textures/planks.png");
 }
@@ -839,6 +842,67 @@ img {
 }
 .dev-level .scrollable {
   overflow: auto;
+}
+
+.help {
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  z-index: 100;
+  opacity: 0;
+  display: none;
+  padding: 40% 10%;
+}
+.help-content {
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  box-shadow: 10px 10px 105px -3px rgba(255, 255, 255, 0.3), inset 23px 31px 30px -8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  font-family: "pixel-type", sans-serif;
+  color: #ead8d2;
+  position: relative;
+}
+.help-title {
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  margin-top: 10px;
+}
+.help-image {
+  width: 100%;
+  height: 60%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  image-rendering: pixelated;
+  background-image: url("../images/mob/dungeon/hound.gif");
+  align-items: center;
+}
+.help-description {
+  width: 100%;
+  height: 100%;
+  padding: 0 20px;
+  font-size: 12px;
+  text-align: justify;
+}
+.help .button-close {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  right: 0px;
+  top: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.help .button-close .icon {
+  width: 10px;
+  height: 9px;
+  image-rendering: pixelated;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("../images/level/cross.png");
 }
 
 /*# sourceMappingURL=style.css.map */

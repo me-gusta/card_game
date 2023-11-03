@@ -746,7 +746,8 @@ const generate_cards = (current_level) => {
         new GeneratorData({
             multiplier: exp_function(current_level),
             level_probabilities
-        }))
+        })
+    )
 
     return test_gen()
 }
