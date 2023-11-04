@@ -12,7 +12,7 @@ import {
 import get_godlike from "./get_godlike";
 import {Vector} from "../ecw/vector";
 import {weapons_map} from "./behaviours/weapons";
-import {in_array} from "./helpers";
+import {in_array, round} from "./helpers";
 import {mobs_map} from "./behaviours/mobs";
 import {
     anim_attack_card,
@@ -23,7 +23,8 @@ import {
 } from "../animations/interactions";
 import {update_card} from "../animations/flip";
 import anime from "animejs/lib/anime.es.js";
-import {q} from "../animations/helpers";
+import {q, sleep} from "../animations/helpers";
+import {anim_hand_selection} from "../animations/card_movement";
 
 const init_board = () => {
     for (let y = 0; y < 3; y++) {
@@ -91,55 +92,101 @@ const consume_card = (on_board_id: number) => {
         }
 
         case E_CardType.weapon: {
+            anim_fade_card(card)
+
             const in_hand = world.q(InHand)
             in_hand.sort((a, b) => a.get(InHand) - b.get(InHand))
 
-            console.log(in_hand.map(ent => {return {
-                id:ent.id, in_hand: ent.get(InHand)
-            }}))
+            console.log(in_hand.map(ent => {
+                return {
+                    id: ent.id, in_hand: ent.get(InHand)
+                }
+            }))
 
             let in_hand_id = in_hand.length
             if (in_hand.length === 3) {
                 // START IF 3
-                for (let i = 0; i < in_hand.length; i++) {
-                    // remove hand selection
-                }
+                // for (let i = 0; i < in_hand.length; i++) {
+                //     // remove hand selection
+                // }
+                deselect()
+                anim_hand_selection()
 
                 const elem_first = q('#card-hand0')
                 const scale = anime.get(elem_first, 'scale')
 
                 const elem_fantom = elem_first.cloneNode(true)
-                elem_fantom.id = 'card-hand-appendix'
+                elem_fantom.id = 'card-hand-phantom'
                 const rect = elem_first.getBoundingClientRect()
 
-                const size = Math.floor(rect.width / scale)
-                console.log(rect, scale, Math.floor(rect.width / scale))
+                const size = round(rect.width / scale)
                 anime.set(elem_fantom, {
                     width: `${size}px`,
                     height: `${size}px`,
                     position: 'absolute',
-                    left: `-${size}px`,
-                    top: 0,
+                    top: '20px',
+                    left: `-${size - 10}px`,
                     scale: 1,
                 })
+                anime.set('#card-hand2', {
+                    opacity: 0
+                })
+
                 q('.hand').appendChild(elem_fantom)
 
+
                 anime.set('.hand', {
-                    translateX: size
+                    translateX: size + 10
                 })
-                return
+                world.killEntity(
+                    world.qo(new InHand(0))
+                )
+                const w_1 = world.qo(new InHand(1))
+                const w_2 = world.qo(new InHand(2))
+                w_1.remove(InHand)
+                w_2.remove(InHand)
+                w_1.add(new InHand(0))
+                w_2.add(new InHand(1))
+                card.remove(OnBoard)
+                card.add(new InHand(2))
+                for (let i = 0; i < 3; i++) {
+                    update_card(document.querySelector('#card-hand' + i), true)
+                }
+
+
+                anime({
+                    targets: '#card-hand2',
+                    duration: 250,
+                    easing: 'easeOutSine',
+                    opacity: 1
+                })
+                anime({
+                    targets: '.hand',
+                    duration: 250,
+                    translateX: 0
+                })
+                anime({
+                    targets: '#card-hand-phantom',
+                    duration: 250,
+                    opacity: 0,
+                    complete: () => {
+                        q('#card-hand-phantom').remove()
+                    }
+                })
+                return;
                 for (let i = 0; i < in_hand.length; i++) {
                     const card_in_hand = in_hand[i]
                     if (i === 0) {
                         world.killEntity(card_in_hand)
-                        anim_weapon_exit(i)
+                        // anim_weapon_exit(i)
                     } else {
                         card_in_hand.remove(InHand)
                         card_in_hand.add(new InHand(i - 1))
-                        anim_weapon_move(i)
+                        // anim_weapon_move(i)
                         // update_card(document.querySelector('#card-hand' + (i - 1)), true)
                     }
                 }
+                return
                 in_hand_id = 2
                 anim_collect_card(card)
 
@@ -180,8 +227,8 @@ const consume_card = (on_board_id: number) => {
                 // }
                 const reserved = in_hand.map(ent => ent.get(InHand))
                 console.log(reserved)
-                for (let i = 0; i < 3; i ++) {
-                    console.log(i,  in_array(reserved, i))
+                for (let i = 0; i < 3; i++) {
+                    console.log(i, in_array(reserved, i))
                     if (!in_array(reserved, i)) {
                         anim_collect_card(card)
 
@@ -238,14 +285,14 @@ const select_item_from_hand = (key: number) => {
 }
 
 
-const remove_faded =() => {
+const remove_faded = () => {
     world.q(OnBoard).forEach(ent => {
         if (ent.has(IsFaded))
             ent.remove(IsFaded)
     })
 }
 
-const ensure_faded =() => {
+const ensure_faded = () => {
     const card = world.qo(InHand, IsChosen)
     if (card === undefined) {
         deselect()

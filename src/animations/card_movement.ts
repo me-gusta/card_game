@@ -1,6 +1,7 @@
 import {Vector} from "../ecw/vector";
-import anime from "animejs/lib/anime.es.js";
-import {extract_digits} from "./helpers";
+import anime from "animejs/lib/anime.es";
+import {world} from "../game/create_world";
+import {InHand, IsChosen} from "../game/components";
 
 let pos_touch_start = null
 
@@ -88,5 +89,54 @@ const set_transform = (elem, offset) => {
 
     anime.set(elem.parentNode, {
         'z-index': z_index
+    })
+}
+const anim_toggle_card = (i) => {
+    const ent = world.qo(new InHand(i))
+    const card = document.querySelector('#card-hand' + i)
+    const class_list = card.parentElement.classList
+
+    const is_active = class_list.contains('active')
+
+    if (ent === undefined) {
+        class_list.remove('active')
+        anime({
+            targets: card,
+            duration: 100,
+            easing: 'easeOutQuad',
+            opacity: 0,
+            scale: 0.6
+        })
+        return
+    }
+
+    if (is_active && ent.get(IsChosen)) return
+
+    if (is_active && !ent.get(IsChosen)) {
+        class_list.remove('active')
+        anime.set(card,{
+            scale: 1
+        })
+    } else if (ent.get(IsChosen)) {
+        anim_choose_card(card)
+    }
+}
+export const anim_hand_selection = () => {
+    for (let i = 0; i < 3; i++) {
+        anim_toggle_card(i)
+    }
+}
+const anim_choose_card = (card) => {
+    card.parentNode.classList.add('active')
+    anime({
+        targets: card,
+        duration: 100,
+        keyframes: [
+            {scale: 1},
+            {scale: 0.7},
+            {scale: 0.8},
+            {scale: 0.9},
+        ],
+        easing: 'easeOutQuad',
     })
 }

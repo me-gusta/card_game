@@ -1,4 +1,4 @@
-import {getRandomInt, in_array, range, shuffleArray} from "../game/helpers";
+import {in_array, range, shuffleArray} from "../game/helpers";
 import {flip_card, update_card} from "../animations/flip";
 import actions from "../game/actions";
 import {extract_digits, img_url, new_element, q, sleep} from "../animations/helpers";
@@ -25,7 +25,7 @@ import create from "../game/create";
 import anime from "animejs/lib/anime.es";
 import {mobs_map} from "../game/behaviours/mobs";
 import get_godlike from "../game/get_godlike";
-import {remove_active_elem, touch_end, touch_move, touch_start} from "../animations/card_movement";
+import {anim_hand_selection, remove_active_elem, touch_end, touch_move, touch_start} from "../animations/card_movement";
 import {from_v, to_v, v} from "../game/local_math";
 import {weapons_map} from "../game/behaviours/weapons";
 import {anim_use_card} from "../animations/interactions";
@@ -37,60 +37,6 @@ import {Vector} from "../ecw/vector";
 
 const cards_amount = 12 - 3
 const max_card_y = cards_amount / 3 - 1
-
-const anim_toggle_card = (i) => {
-    const ent = world.qo(new InHand(i))
-    const card = document.querySelector('#card-hand' + i)
-    const class_list = card.parentElement.classList
-
-    const is_active = class_list.contains('active')
-
-    if (ent === undefined) {
-        class_list.remove('active')
-        anime({
-            targets: card,
-            duration: 100,
-            easing: 'easeOutQuad',
-            opacity: 0,
-            scale: 0.6
-        })
-        return
-    }
-
-    if (is_active && ent.get(IsChosen)) return
-
-    if (is_active && !ent.get(IsChosen)) {
-        class_list.remove('active')
-        // anime({
-        //     targets: card,
-        //     duration: 100,
-        //     easing: 'easeOutQuad',
-        //     opacity: 0,
-        //     scale: 0.6
-        // })
-    } else if (ent.get(IsChosen)) {
-        choose_card(card)
-    }
-}
-const anim_hand_selection = () => {
-    for (let i = 0; i < 3; i++) {
-        anim_toggle_card(i)
-    }
-}
-const choose_card = (card) => {
-    card.parentNode.classList.add('active')
-    anime({
-        targets: card,
-        duration: 100,
-        keyframes: [
-            {scale: 1},
-            {scale: 0.7},
-            {scale: 0.8},
-            {scale: 0.9},
-        ],
-        easing: 'easeOutQuad',
-    })
-}
 
 const get_swipe_direction = (dir_string) => {
     switch (dir_string) {
@@ -202,7 +148,6 @@ const set_hand_card_value = (ent) => {
 
 let can_process = true
 const process_event = async (data) => {
-
     if (!can_process) return;
 
     const action = data.action
@@ -560,84 +505,11 @@ const flip_all = async () => {
     }
 }
 
-const move_deck2 = async () => {
-
-    for (let x = 2; x >= 0; x--) {
-        actions.consume_card(x)
-        // board = parse_board()
-        // board[x] = undefined
-
-        // hand = parse_hand()
-        await sleep(250)
-
-    }
-
-    for (let y = 1; y < 4; y++) {
-        for (let x = 0; x < 3; x++) {
-            actions.move_down_on_board(v(x, y))
-        }
-    }
-
-    anime({
-        targets: '.card-board',
-        // easing: 'linear',
-        translateY: '109.01%',
-        duration: 500,
-        complete: async () => {
-            for (let y = 0; y < (cards_amount / 3); y++) {
-                for (let x = 0; x < 3; x++) {
-                    const elem = document.querySelector('#card-' + from_v([x, y]))
-                    if (y === max_card_y) {
-                        anime.set(elem, {
-                            translateY: '-130%',
-                            translateX: '0%',
-                            opacity: 1,
-                            scaleX: 1,
-                            scaleY: 1,
-                            scale: 1,
-                        })
-
-                        anime.set(elem.parentElement, {
-                            'z-index': 10
-                        })
-                        continue
-                    }
-
-                    update_card(elem)
-                    anime.set(elem, {
-                        translateY: '0%',
-                        translateX: '0%',
-                        opacity: 1,
-                        scale: 1,
-                        scaleX: 1,
-                        scaleY: 1,
-                    })
-                }
-            }
-
-            for (let x = 0; x < 3; x++) {
-                actions.add_new_on_board(v(x, max_card_y))
-                const elem = document.querySelector('#card-' + from_v([x, max_card_y]))
-                update_card(elem)
-                anime({
-                    targets: elem,
-                    translateY: '0%',
-                    duration: 500,
-                    opacity: 1,
-                })
-            }
-
-
-        }
-    })
-}
-
-
 const move_deck = async () => {
 
     for (let x = 2; x >= 0; x--) {
         actions.consume_card(x)
-        await sleep(255)
+        await sleep(55)
 
     }
 
