@@ -1,5 +1,6 @@
 import {world} from "./create_world";
 import {
+    ActionSwitch,
     CardType,
     CardVariant,
     Crate, DevData,
@@ -196,6 +197,9 @@ const godlike = (run_data) => {
 
     world.createEntity(
         new GodLike(),
+        new ActionSwitch({
+            available: false
+        }),
         new RoundData({
             turn: 0
         }),

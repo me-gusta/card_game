@@ -1,5 +1,5 @@
 import {world} from "./create_world";
-import {GodLike, PlayerData, RoundData, RunData} from "./components";
+import {ActionSwitch, GodLike, PlayerData, RoundData, RunData} from "./components";
 import {world_global} from "../global/create_world";
 
 const godlike = () => {
@@ -18,11 +18,16 @@ const run_data = () => {
     return world_global.qo(RunData).get(RunData)
 }
 
+const action_switch = () => {
+    return world.qo(ActionSwitch).get(ActionSwitch)
+}
+
 
 
 export default {
     round_data,
     player_data,
     godlike,
-    run_data
+    run_data,
+    action_switch
 }

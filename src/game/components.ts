@@ -88,6 +88,9 @@ export class OnTurnEnd extends C_Tag {}
 export class OnTurnStart extends C_Tag {}
 export class OnCardAttacked extends C_Tag {}
 
+export class ActionSwitch extends C_Object<any> {
+}
+
 export class RunData extends C_Object<any> {
 }
 

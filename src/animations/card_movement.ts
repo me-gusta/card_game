@@ -131,12 +131,12 @@ const anim_choose_card = (card) => {
     anime({
         targets: card,
         duration: 100,
+        easing: 'easeOutQuad',
         keyframes: [
             {scale: 1},
             {scale: 0.7},
             {scale: 0.8},
             {scale: 0.9},
         ],
-        easing: 'easeOutQuad',
     })
 }

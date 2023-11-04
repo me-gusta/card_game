@@ -35,6 +35,20 @@ import routes from "../routes";
 import {Draggable} from '@shopify/draggable';
 import {Vector} from "../ecw/vector";
 
+const set_available = () => {
+    const as = get_godlike.action_switch()
+    as.available = true
+}
+
+const is_available = () => {
+    return get_godlike.action_switch().available
+}
+
+const set_unavailable = () => {
+    const as = get_godlike.action_switch()
+    as.available = false
+}
+
 const cards_amount = 12 - 3
 const max_card_y = cards_amount / 3 - 1
 
@@ -146,9 +160,8 @@ const set_hand_card_value = (ent) => {
     card.textContent = ent.get(Value)
 }
 
-let can_process = true
-const process_event = async (data) => {
-    if (!can_process) return;
+
+const process = (data) => {
 
     const action = data.action
     const key = Number(data.key)
@@ -206,7 +219,6 @@ const process_event = async (data) => {
 
         if (neighbour === undefined) return
 
-        can_process = false
 
         let card = world.qo(new OnBoard(key))
         const is_on_swap = make_on_swap(card, neighbour)
@@ -240,10 +252,9 @@ const process_event = async (data) => {
             await sleep(250)
 
             anim_faded()
-
-            can_process = true
+            set_available()
         }, delay)
-        return
+        return -1
     }
 
 
@@ -265,7 +276,6 @@ const process_event = async (data) => {
         world.q(OnCardAttacked, OnBoard).forEach(ent => {
             const {on_card_attacked} = mobs_map.get(ent.get(CardVariant))
             on_card_attacked(ent, target, active_item)
-            console.log('sadad')
         })
 
         setTimeout(() => {
@@ -275,18 +285,28 @@ const process_event = async (data) => {
             anim_faded()
             setTimeout(anim_hand_selection, 100)
         }, 250)
-        // parse_all()
-        // await check_dead()
-        // parse_all()
-
-        // parse_all()
+        return 350
     } else {
         actions.deselect()
         actions.select_item_from_hand(key)
         anim_hand_selection()
         actions.ensure_faded()
         anim_faded()
-        // parse_all()
+    }
+}
+
+const process_event = async (data) => {
+    if (!is_available())
+        return
+    set_unavailable()
+
+
+    const delay = process(data)
+    if (delay === undefined) {
+        set_available()
+    }
+    if (delay >= 0) {
+        setTimeout(set_available, delay + 5)
     }
 }
 
@@ -470,8 +490,8 @@ const setup = () => {
 
 export const anim_faded = () => {
     const faded = world.q(IsFaded).map(ent => ent.get(OnBoard))
-    for (let i = 0; i < cards_amount; i ++) {
-        const targets = q('#card-'+ i)
+    for (let i = 0; i < cards_amount; i++) {
+        const targets = q('#card-' + i)
         const opacity = in_array(faded, i) ? 0.6 : 1
         anime({
             targets,
@@ -483,18 +503,18 @@ export const anim_faded = () => {
 }
 
 const start_turn = async () => {
+    console.log('START TURN')
     actions.start_turn()
 
     actions.ensure_active_item()
     actions.ensure_faded()
     anim_faded()
 
-    await sleep(200)
+    await sleep(20)
     // await check_dead()
     anim_swipe_points()
     anim_hand_selection()
-
-
+    set_available()
 }
 const flip_all = async () => {
     const numbers = shuffleArray([...range(0, cards_amount)])
@@ -534,34 +554,12 @@ const move_deck = async () => {
                 scaleY: 1,
                 scale: 1,
             })
-            continue
-            if (y === 0) {
-                anime.set(elem, {
-                    translateY: '-330%',
-                    translateX: '0%',
-                    opacity: 1,
-                    scaleX: 1,
-                    scaleY: 1,
-                    scale: 1,
-                })
-
-                anime.set(elem.parentElement, {
-                    'z-index': 210
-                })
-                continue
-            }
         }
     }
 
     anime.set('.board', {
         translateY: -margin - 10
     })
-
-    // for (let x = 0; x < 3; x++) {
-    //     actions.add_new_on_board(v(x, max_card_y))
-    //     const elem = document.querySelector('#card-' + from_v([x, max_card_y]))
-    //     update_card(elem)
-    // }
 
     for (let y = 0; y < (cards_amount / 3); y++) {
         for (let x = 0; x < 3; x++) {
@@ -576,45 +574,14 @@ const move_deck = async () => {
                 scaleX: 1,
                 scaleY: 1,
             })
-            // anime.set('.board', {
-            //     translateY: '0%',
-            // })
         }
-    }
-    // return
-
-    const after = async () => {
-        for (let y = 0; y < (cards_amount / 3); y++) {
-            for (let x = 0; x < 3; x++) {
-                const elem = document.querySelector('#card-' + from_v([x, y]))
-                update_card(elem)
-                anime.set(elem, {
-                    translateY: '0%',
-                    translateX: '0%',
-                    opacity: 1,
-                    scale: 1,
-                    scaleX: 1,
-                    scaleY: 1,
-                })
-                anime.set('.board', {
-                    translateY: '0%',
-                })
-            }
-        }
-        return
-
-
-
-
     }
 
     anime({
         targets: '.card-board',
         easing: 'easeOutSine',
-        // translateY: '30%',
         opacity: 1,
         duration: 100,
-        // complete: after
     })
 
     anime({
@@ -622,13 +589,15 @@ const move_deck = async () => {
         easing: 'easeOutBack',
         translateY: 0,
         duration: 300,
-        // complete: after
     })
 }
 
 
 const end_turn = async () => {
+    if (!is_available())
+        return
     console.log('end turn')
+    set_unavailable()
     actions.end_turn()
 
     actions.remove_faded()
@@ -648,7 +617,7 @@ const end_turn = async () => {
 
     await move_deck()
 
-    await sleep(1000)
+    // await sleep(10)
 
     // for (let i = 0; i < cards_amount; i++) {
     //     anime.set('#card-' + i, {
