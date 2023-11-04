@@ -876,7 +876,6 @@ img {
   background-repeat: no-repeat;
   background-position: center center;
   image-rendering: pixelated;
-  background-image: url("../images/mob/dungeon/hound.gif");
   align-items: center;
 }
 .help-description {

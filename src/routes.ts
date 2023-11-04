@@ -79,13 +79,12 @@ const level = {
             
             <div class="wrap help">
                 <div class="help-content bg bg-clouds">
-                    <div class="help-title text-shadow">HOUND</div>
+                    <div class="help-title text-shadow">NAME</div>
                     <div class="help-image"></div>
                     <div class="help-description text-shadow">
-                        This thing is absolute danger. play with fire
-                    </div>
-                    <div class="button-close">
-                        <div class="icon icon-cross"></div>
+                        Play with caution. Subtract fear.
+                        Don't enter fire if you don't have enough water around.
+                        Read books.
                     </div>
                 </div>
             </div>
@@ -101,7 +100,7 @@ const level = {
             init_route(menu)
         })
 
-        q('.button-close').addEventListener('click', () => {
+        const close_help = () => {
             anime({
                 targets: '.help',
                 easing: 'easeOutSine',
@@ -113,7 +112,9 @@ const level = {
                     })
                 }
             })
-        })
+        }
+
+        q('.help').addEventListener('click', close_help)
 
         run_level().then()
     }

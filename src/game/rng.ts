@@ -52,7 +52,7 @@ const build_variations_map = (): Map<string, E_CardType> => {
     return map
 }
 
-const card_variations_map = build_variations_map()
+export const card_variations_map = build_variations_map()
 
 
 export const one = (tag) => {
@@ -93,7 +93,7 @@ const card = (is_good) => {
         return mob()
 }
 
-const get_map_entry = (tag, variant) => {
+export const get_map_entry = (tag, variant) => {
     switch (tag) {
         case 'mob':
             return mobs_map.get(variant)
