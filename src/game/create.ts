@@ -73,6 +73,7 @@ const upcoming = (data) => {
 
             switch (type) {
                 case E_CardType.weapon: {
+                    console.log(variant)
                     const {
                         value_range
                     } = weapons_map.get(variant)
@@ -176,7 +177,7 @@ const hand = () => {
         new InHand(1),
         new Value(20),
         new CardType(E_CardType.weapon),
-        new CardVariant('mace'),
+        new CardVariant('master_key'),
     )
     world.createEntity(
         new InHand(2),

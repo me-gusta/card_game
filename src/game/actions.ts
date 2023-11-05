@@ -58,10 +58,10 @@ const consume_card = (on_board_id: number) => {
         case E_CardType.food: {
             player.hp = Math.min(player.hp + value, player.hp_max)
             clear_effects()
+            anim_poison()
             anim_collect_card(card)
             anim_hero_heal()
             world.killEntity(card)
-            anim_poison()
             break
         }
         case E_CardType.mob: {
@@ -174,71 +174,15 @@ const consume_card = (on_board_id: number) => {
                         q('#card-hand-phantom').remove()
                     }
                 })
-                return;
-                for (let i = 0; i < in_hand.length; i++) {
-                    const card_in_hand = in_hand[i]
-                    if (i === 0) {
-                        world.killEntity(card_in_hand)
-                        // anim_weapon_exit(i)
-                    } else {
-                        card_in_hand.remove(InHand)
-                        card_in_hand.add(new InHand(i - 1))
-                        // anim_weapon_move(i)
-                        // update_card(document.querySelector('#card-hand' + (i - 1)), true)
-                    }
-                }
-                return
-                in_hand_id = 2
-                anim_collect_card(card)
-
-                setTimeout(() => {
-                    for (let i = 0; i < in_hand.length; i++) {
-                        const elem = document.querySelector('#card-hand' + i)
-                        update_card(elem, true)
-                        if (i !== 2)
-                            anime.set(elem, {
-                                translateX: 0,
-                                scale: 1
-                            })
-                    }
-
-                    card.remove(OnBoard)
-                    card.add(new InHand(in_hand_id))
-                    update_card(q('#card-hand' + in_hand_id), true)
-
-                    anime.set('#card-hand' + in_hand_id, {
-                        translateX: 0,
-                        opacity: 0
-                    })
-                    anim_new_weapon(in_hand_id)
-
-                }, 105)
-                // END IF 3
 
             } else {
-                // if (in_hand.length === 2) {
-                //     const a = in_hand[0].get(InHand)
-                //     const b = in_hand[1].get(InHand)
-                //     console.log(a, b)
-                //     if (a === 0 && b === 2)
-                //         in_hand_id = 1
-                //     if (a === 1 && b === 2)
-                //         in_hand_id = 0
-                //
-                // }
                 const reserved = in_hand.map(ent => ent.get(InHand))
-                // console.log(reserved)
                 for (let i = 0; i < 3; i++) {
-                    // console.log(i, in_array(reserved, i))
                     if (!in_array(reserved, i)) {
-                        // anim_collect_card(card)
-
-
                         card.remove(OnBoard)
                         card.add(new InHand(i))
 
                         update_card(q('#card-hand' + i), true)
-                        // console.log('#card-hand' + i)
                         anim_new_weapon(i)
                         break
                     }
@@ -297,7 +241,7 @@ const ensure_faded = () => {
     const card = world.qo(InHand, IsChosen)
     if (card === undefined) {
         deselect()
-        return
+        return false
     }
 
     const name = card.get(CardVariant)
@@ -309,12 +253,12 @@ const ensure_faded = () => {
     const candidates = select(filters, pattern).map(ent => ent.id)
 
     world.q(OnBoard).forEach(ent => {
-        // console.log('candidat',ent.get(OnBoard), !in_array(candidates, ent.id))
         if (!in_array(candidates, ent.id))
             ent.add(IsFaded)
         else if (ent.has(IsFaded))
             ent.remove(IsFaded)
     })
+    return true
 }
 
 const deselect = () => {
@@ -407,6 +351,7 @@ export default {
     ensure_faded,
     remove_faded,
     start_turn,
+    clear_effects,
     apply_poison,
     trigger_on_end_turn
 }

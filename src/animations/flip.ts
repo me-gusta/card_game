@@ -545,6 +545,8 @@ export const flip_card = (card, cfg: {
     custom_update?,
     direction?
 } = {direction: 'right'}) => {
+    const id = card.id
+    card = q(`#${id}:not(.draggable--over)`)
 
     anime.set(card, {
         translateX: 0,

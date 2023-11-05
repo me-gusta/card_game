@@ -1,6 +1,8 @@
 import * as _ from "lodash/fp";
 import {getRandomInt, in_array, shuffleArray} from "./helpers";
 import {card_variations_map, get_map_entry} from "./rng";
+import {extract} from "../global/create_world";
+import {E_CardType, SpellsUserData} from "./components";
 
 
 const insert_proportionally = (a, b) => {
@@ -141,10 +143,24 @@ export const generate = (gen_data) => {
     shuffleArray(weapons_special)
     shuffleArray(weapons_last)
 
+    // query active spells and replace swords with spells
+    const spells_ud = extract(SpellsUserData)
+    for (let variant of spells_ud) {
+        if (!variant)
+            continue
+        const spell = {
+            type: E_CardType.weapon,
+            variant,
+            value: 1
+        }
+        weapons_basic.pop()
+        weapons_special.push(spell)
+    }
+
     console.log('WEAPONS GENERATED')
-    console.log(weapons_special)
-    console.log(weapons_last)
-    console.log(weapons_basic)
+    console.log([...weapons_special])
+    console.log([...weapons_last])
+    console.log([...weapons_basic])
 
     // gen food
     let food = []

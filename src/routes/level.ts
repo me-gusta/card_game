@@ -35,6 +35,7 @@ import routes from "../routes";
 import {Draggable} from '@shopify/draggable';
 import {Vector} from "../ecw/vector";
 import {half_or_kill} from "../game/behaviours/util";
+import {createLogger} from "vite";
 
 const set_available = () => {
     const as = get_godlike.action_switch()
@@ -162,7 +163,7 @@ const set_hand_card_value = (ent) => {
 }
 
 
-const process = (data) => {
+const process = async (data) => {
 
     const action = data.action
     const key = Number(data.key)
@@ -224,38 +225,41 @@ const process = (data) => {
         let card = world.qo(new OnBoard(key))
         const is_on_swap = make_on_swap(card, neighbour)
 
-        console.log(is_on_swap)
+        let delay_sum = is_on_swap ? 300 : 0
 
-        const delay = is_on_swap ? 300 : 0
+        await sleep(delay_sum)
 
-        setTimeout(async () => {
-            const is_dead = check_dead()
-            console.log('is_dead', is_dead)
-            if (is_dead)
-                await sleep(500)
+        const is_dead = check_dead()
+        console.log('is_dead', is_dead)
+        if (is_dead) {
+            delay_sum += 500
+            await sleep(500)
+        }
 
-            // query one more time because of possible exception if cards are dead
-            card = world.qo(new OnBoard(key))
-            neighbour = world.qo(new OnBoard(key_other))
+        // query one more time because of possible exception if cards are dead
+        card = world.qo(new OnBoard(key))
+        neighbour = world.qo(new OnBoard(key_other))
 
 
-            card.remove(OnBoard)
-            neighbour.remove(OnBoard)
+        card.remove(OnBoard)
+        neighbour.remove(OnBoard)
 
-            card.add(new OnBoard(key_other))
-            neighbour.add(new OnBoard(key))
+        card.add(new OnBoard(key_other))
+        neighbour.add(new OnBoard(key))
 
-            player.swipe_points -= 1
-            anim_swipe_points()
-            anim_swipe(key, key_other)
+        player.swipe_points -= 1
+        anim_swipe_points()
+        anim_swipe(key, key_other)
 
-            actions.ensure_faded()
+        if (actions.ensure_faded()) {
             await sleep(250)
-
+            delay_sum += 250
             anim_faded()
-            set_available()
-        }, delay)
-        return -1
+        }
+
+        set_available()
+
+        return delay_sum
     }
 
 
@@ -297,8 +301,7 @@ const process = (data) => {
 }
 
 const check_coins_row = async () => {
-    console.log('%c START COIN CHECK', 'font-size:22px;color: red')
-    const for_update = []
+    let for_update = []
     const checks = [
         {
             positions: [[0, 0], [1, 0], [2, 0]],
@@ -322,18 +325,25 @@ const check_coins_row = async () => {
     if (for_update.length)
         await sleep(650)
 
-    for_update.forEach(ent => {
+    const unique_ids = []
+    const uniques = []
+    for (let ent of for_update) {
+        if (in_array(unique_ids, ent.id))
+            continue
+        uniques.push(ent)
+        unique_ids.push(ent.id)
+    }
+
+    uniques.forEach(ent => {
         ent.add(new CardVariant('ruby'))
         ent.modify(Value).mul(7)
         flip_card(q('#card-' + ent.get(OnBoard)))
-        console.log('replace')
     })
 }
 
 
 const check_mobs_between_coins = async () => {
-    console.log('%c START between CHECK', 'font-size:22px;color: red')
-    const for_update = []
+    let for_update = []
     const checks = [
         {
             positions: [[0, 0], [1, 0], [2, 0]],
@@ -359,10 +369,11 @@ const check_mobs_between_coins = async () => {
     if (for_update.length)
         await sleep(350)
 
-    for_update.forEach(ent => {
+    for (const ent of for_update) {
         half_or_kill(ent)
         anim_deal_damage(ent)
-    })
+        await sleep(50)
+    }
 }
 
 const process_event = async (data) => {
@@ -371,7 +382,7 @@ const process_event = async (data) => {
     set_unavailable()
 
 
-    const delay = process(data)
+    const delay = await process(data)
 
 
     if (delay === undefined) {
@@ -381,6 +392,7 @@ const process_event = async (data) => {
         set_available()
     }
     if (delay >= 0) {
+        console.log('MYDEL', delay)
         setTimeout(async () => {
             await check_mobs_between_coins()
             await check_coins_row()
@@ -586,10 +598,11 @@ const start_turn = async () => {
     actions.start_turn()
 
     actions.ensure_active_item()
-    actions.ensure_faded()
-    anim_faded()
+    if (actions.ensure_faded()) {
+        anim_faded()
+        await sleep(200)
+    }
 
-    await sleep(20)
     // await check_dead()
     anim_swipe_points()
     anim_hand_selection()
@@ -706,14 +719,6 @@ const end_turn = async () => {
     } else {
         anim_poison()
     }
-
-    // await sleep(10)
-
-    // for (let i = 0; i < cards_amount; i++) {
-    //     anime.set('#card-' + i, {
-    //         transformX: 0
-    //     })
-    // }
 
     if (!await check_if_finished())
         await start_turn()

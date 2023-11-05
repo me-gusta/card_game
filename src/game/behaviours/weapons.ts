@@ -16,10 +16,11 @@ import create from "../create";
 import filters from "../filters";
 import {half_or_kill} from "./util";
 import get_godlike from "../get_godlike";
-import {anim_deal_damage, anim_hero_take_damage} from "../../animations/interactions";
+import {anim_deal_damage, anim_hero_heal, anim_hero_take_damage, anim_poison} from "../../animations/interactions";
 import actions from "../actions";
-import {lib_spells, lib_weapons} from "../../global/libs";
-import {flip_entity} from "../../animations/flip";
+import {lib_mobs, lib_spells, lib_weapons} from "../../global/libs";
+import {flip_card, flip_entity} from "../../animations/flip";
+import {q} from "../../animations/helpers";
 
 const calc_damage = (actor, target) => {
 
@@ -31,6 +32,19 @@ const calc_damage = (actor, target) => {
     } else {
         return value
     }
+}
+
+const replace_loot = (target, loot) => {
+    if (target.has(LootId)) {
+        const loot = world.qe(target.get(LootId))
+        world.killEntity(loot)
+    }
+    loot.add(
+        new InLootPile()
+    )
+    target.add(
+        new LootId(loot.id)
+    )
 }
 
 export const weapons_map = new Map([
@@ -285,17 +299,23 @@ export const weapons_map = new Map([
         on_choice: (actor: Entity, target: Entity) => {
             target.modify(Value).mul(2)
             actor.modify(Value).set(0)
+            anim_deal_damage(target)
         },
     }],
     [lib_spells.make_frog, {
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             const key = target.get(OnBoard)
-            target.remove(OnBoard)
+            // target.remove(OnBoard)
+            target.modify(Value).set(0)
 
-            create.mob('frog', key)
+            replace_loot(target, world.createEntity(
+                new Value(1),
+                new CardType(E_CardType.mob),
+                new CardVariant(lib_mobs.frog),
+            ))
+
             actor.modify(Value).set(0)
-
         },
         description: '',
     }],
@@ -308,13 +328,12 @@ export const weapons_map = new Map([
             const food = world.q(OnBoard, new CardType(E_CardType.food))
             pick_n_random(3, food).forEach(ent => {
 
-                const key = ent.get(OnBoard)
-                ent.remove(OnBoard)
-                world.createEntity(
-                    new OnBoard(key),
+                ent.modify(Value).set(0)
+
+                replace_loot(target, world.createEntity(
                     new Value(getRandomInt(3, 7)),
                     new CardType(E_CardType.coin),
-                )
+                ))
             })
             actor.modify(Value).set(0)
 
@@ -332,29 +351,28 @@ export const weapons_map = new Map([
             )
             enemy.modify(Value).set(0)
             actor.modify(Value).set(0)
+            anim_deal_damage(enemy)
         },
         description: '',
     }],
-    [lib_spells.liquidate, {
+    [lib_spells.recruit, {
         value_range: [1, 1],
         filters: [
             filters.is_of_type(E_CardType.mob),
         ],
         on_choice: (actor: Entity, target: Entity) => {
 
-            const key = target.get(OnBoard)
             const value = target.get(Value)
             const variant = getRandomChoice(
-                ['sword', 'mace', 'whip']
+                ['sword']
             )
-            target.remove(OnBoard)
+            target.modify(Value).set(0)
 
-            world.createEntity(
-                new OnBoard(key),
+            replace_loot(target, world.createEntity(
                 new Value(value),
                 new CardType(E_CardType.weapon),
                 new CardVariant(variant),
-            )
+            ))
 
             actor.modify(Value).set(0)
         },
@@ -363,20 +381,19 @@ export const weapons_map = new Map([
     [lib_spells.disinfect, {
         value_range: [1, 1],
         filters: [
-            filters.is_of_type(E_CardType.mob).and(
-                filters.value_lt(5)
-            )
+            filters.is_of_type(E_CardType.mob)
         ],
         on_choice: (actor: Entity, target: Entity) => {
-
+            const target_value = target.get(Value)
             select(
                 [
                     filters.is_of_type(E_CardType.mob).and(
-                        filters.value_lt(5)
+                        filters.value_lt(target_value)
                     )
                 ]
             ).forEach(ent => {
                 ent.modify(Value).set(0)
+                anim_deal_damage(ent)
             })
 
             actor.modify(Value).set(0)
@@ -387,15 +404,14 @@ export const weapons_map = new Map([
         value_range: [1, 1],
         on_choice: (actor: Entity, target: Entity) => {
             pick_n_random(3, world.q(OnBoard)).forEach(ent => {
-                const key = ent.get(OnBoard)
-                ent.remove(OnBoard)
+                const value = ent.get(Value)
+                ent.modify(Value).set(0)
 
-                world.createEntity(
-                    new OnBoard(key),
-                    new Value(3),
+                replace_loot(ent, world.createEntity(
+                    new Value(value),
                     new CardType(E_CardType.food),
                     new CardVariant('apple'),
-                )
+                ))
             })
 
             actor.modify(Value).set(0)
@@ -407,6 +423,7 @@ export const weapons_map = new Map([
         on_choice: (actor: Entity, target: Entity) => {
             world.q(OnBoard, new CardType(E_CardType.mob)).forEach(ent => {
                 half_or_kill(ent)
+                anim_deal_damage(ent)
             })
 
             actor.modify(Value).set(0)
@@ -419,9 +436,10 @@ export const weapons_map = new Map([
             filters.is_of_type(E_CardType.weapon)
         ],
         on_choice: (actor: Entity, target: Entity) => {
-            const value = actor.get(Value)
+            const value = target.get(Value)
             relative(target, [], pattern_around).forEach(ent => {
                 ent.modify(Value).sub(value)
+                anim_deal_damage(ent)
             })
 
             actor.modify(Value).set(0)
@@ -435,13 +453,11 @@ export const weapons_map = new Map([
             const on_board = world.q(OnBoard)
             on_board.forEach(ent => {
                 if (c >= on_board.length - 1) return
-                const key = ent.get(OnBoard)
-                ent.remove(OnBoard)
-                world.createEntity(
-                    new OnBoard(key),
+                ent.modify(Value).set(0)
+                replace_loot(ent, world.createEntity(
                     new Value(getRandomInt(3, 7)),
                     new CardType(E_CardType.coin),
-                )
+                ))
                 c++
             })
 
@@ -458,6 +474,10 @@ export const weapons_map = new Map([
                 player.hp = Math.min(
                     player.hp + 1, player.hp_max
                 )
+                anim_deal_damage(ent)
+                anim_hero_heal()
+                actions.clear_effects()
+                anim_poison()
             })
 
             actor.modify(Value).set(0)
@@ -470,16 +490,15 @@ export const weapons_map = new Map([
             filters.is_of_type(E_CardType.coin)
         ],
         on_choice: (actor: Entity, target: Entity) => {
-            const value = target.get(Value)
-            const key = target.get(OnBoard)
-            target.remove(OnBoard)
+            const pd = get_godlike.player_data()
 
-            world.createEntity(
-                new OnBoard(key),
-                new Value(value),
+            target.modify(Value).set(0)
+
+            replace_loot(target, world.createEntity(
+                new Value(pd.hp_max),
                 new CardType(E_CardType.food),
                 new CardVariant('omlet'),
-            )
+            ))
 
             actor.modify(Value).set(0)
         },
@@ -496,6 +515,23 @@ export const weapons_map = new Map([
                 loot_card.modify(Value).mul(2)
             }
             target.modify(Value).set(0)
+            anim_deal_damage(target)
+
+            relative(target, [], pattern_around).forEach(ent => {
+                if (ent.id === target.id)
+                    return
+
+                const random = getRandomInt(1, 100)
+                console.log('RANDOM', random)
+                if (random <= 50)
+                    return
+
+                ent.modify(Value).set(0)
+                replace_loot(ent, world.createEntity(
+                    new Value(getRandomInt(3, 7)),
+                    new CardType(E_CardType.coin),
+                ))
+            })
 
             actor.modify(Value).set(0)
         },
@@ -509,7 +545,7 @@ export const weapons_map = new Map([
         ],
         on_choice: (actor: Entity, target: Entity) => {
             target.modify(Value).mul(4)
-
+            anim_deal_damage(target)
             actor.modify(Value).set(0)
         },
         description: '',
