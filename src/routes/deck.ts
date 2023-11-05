@@ -3,18 +3,16 @@ import {img_url, q} from "../animations/helpers";
 import {flip_card} from "../animations/flip";
 import anime from "animejs/lib/anime.es";
 import {world} from "../game/create_world";
-import {CardVariant, SpellLib} from "../game/components";
-import {world_global} from "../global/create_world";
+import {CardVariant, SpellLib, SpellsUserData} from "../game/components";
+import {extract, world_global} from "../global/create_world";
 import {weapons_map} from "../game/behaviours/weapons";
 import {i18n} from "../localization";
 import {init_route} from "../routing";
 import routes from "../routes";
 
-const set_spell = (card, ent) => {
-    const icon = card.parentNode.querySelector('.card-icon')
-    const variant = ent.get(CardVariant)
+const set_spell = (card, variant) => {
     const description = i18n.t(variant)
-    const url_icon = img_url(`weapons/${variant}`, true)
+    const url_icon = img_url(`weapon/${variant}`, true)
     if (card.id.includes('slider')) {
         q('.description').textContent = description
         q('.title').textContent = i18n.t('title_' + variant)
@@ -49,7 +47,11 @@ const anim_choosing = (is_choosing) => {
 }
 
 const enable_card = (key, spell) => {
-    set_spell(q('#card-' + key), spell)
+    const spells_ud = extract(SpellsUserData)
+    spells_ud[key] = spell.get(CardVariant)
+    localStorage.setItem('spells_user_data', JSON.stringify(spells_ud))
+
+    set_spell(q('#card-' + key), spell.get(CardVariant))
 }
 
 export const deck = {
@@ -75,6 +77,15 @@ export const deck = {
     </div>
     `,
     init: async () => {
+        let action_available = true
+        const set_available = () => {
+            action_available = true
+        }
+
+        const unset_available = () => {
+            action_available = false
+        }
+
         let is_choosing = false
 
         const set_choosing = () => {
@@ -98,14 +109,22 @@ export const deck = {
             'width': size_icon,
             'height': size_icon,
         })
-        set_spell(card, spells[current_spell])
+
+        set_spell(card, spells[current_spell].get(CardVariant))
+
+        const spells_ud = extract(SpellsUserData)
 
         for (let i = 0; i < 2; i++) {
             q('.in-use').appendChild(create_card({i: i, no_events: true}))
-            set_spell(q('#card-' + i), spells[current_spell])
+            console.log(spells_ud[i])
+            if (spells_ud[i])
+                set_spell(q('#card-' + i), spells_ud[i])
         }
 
         q('.next').onclick = () => {
+            if (!action_available)
+                return
+            unset_available()
             unset_choosing()
             if (current_spell === spells.length - 1)
                 current_spell = 0
@@ -113,11 +132,17 @@ export const deck = {
                 current_spell++
             flip_card(card, {
                 in_hand: false,
-                custom_update: () => set_spell(card, spells[current_spell]),
-                direction: 'down'
+                custom_update: () => set_spell(card, spells[current_spell].get(CardVariant)),
+                direction: 'right'
             })
+            setTimeout(() => {
+                set_available()
+            }, 350)
         }
         q('.prev').onclick = () => {
+            if (!action_available)
+                return
+            unset_available()
             unset_choosing()
             if (current_spell === 0)
                 current_spell = spells.length - 1
@@ -125,9 +150,12 @@ export const deck = {
                 current_spell--
             flip_card(card, {
                 in_hand: false,
-                custom_update: () => set_spell(card, spells[current_spell]),
-                direction: 'up'
+                custom_update: () => set_spell(card, spells[current_spell].get(CardVariant)),
+                direction: 'left'
             })
+            setTimeout(() => {
+                set_available()
+            }, 350)
         }
 
         q('.use').onclick = () => {
@@ -137,10 +165,14 @@ export const deck = {
         }
 
         q('#card-0').onclick = () => {
+            if (!is_choosing)
+                return
             enable_card(0, spells[current_spell])
             unset_choosing()
         }
         q('#card-1').onclick = () => {
+            if (!is_choosing)
+                return
             enable_card(1, spells[current_spell])
             unset_choosing()
         }

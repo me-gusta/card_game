@@ -107,3 +107,6 @@ export class LevelResults extends C_Object<any> {
 }
 
 export class SpellLib extends C_Tag {}
+
+export class SpellsUserData extends C_Object<any> {
+}

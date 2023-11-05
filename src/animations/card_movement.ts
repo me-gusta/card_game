@@ -118,8 +118,6 @@ const anim_toggle_card = (i) => {
             scale: 1
         })
     } else if (ent.get(IsChosen)) {
-        console.log('%c CARD CHOSEN', 'color:red;font-size:24px')
-        console.log(card)
         anim_choose_card(card)
     }
 }

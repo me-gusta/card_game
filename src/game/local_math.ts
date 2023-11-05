@@ -65,9 +65,11 @@ export const relative = (ent: Entity, filter, pattern) => {
 export const pattern_around = [[0, 0],[0, 1], [0, -1], [1, 0], [-1, 0]]
 export const pattern_row = [[-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0]]
 export const pattern_col = [
-    [0, 2], [0, 1],
+    [0, 2],
+    [0, 1],
     [0, 0],
-    [0, -1], [0, -2]
+    [0, -1],
+    [0, -2]
 ]
 
 export const pattern_chess = [

@@ -1,5 +1,5 @@
 import {World} from "../ecw/world";
-import {CardType, CardVariant, DevData, E_CardType, GodLike, SpellLib} from "../game/components";
+import {CardType, CardVariant, DevData, E_CardType, GodLike, SpellLib, SpellsUserData} from "../game/components";
 import {lib_spells} from "./libs";
 
 const create_world_global = () => {
@@ -9,6 +9,14 @@ const create_world_global = () => {
     const dev_data = JSON.parse(localStorage.getItem('dev_data'))
     if (dev_data)
         god_like.add(new DevData(dev_data))
+
+    const spells_user_data = JSON.parse(localStorage.getItem('spells_user_data'))
+    if (spells_user_data)
+        god_like.add(new SpellsUserData(spells_user_data))
+    else
+        god_like.add(
+            new SpellsUserData([null, null])
+        )
 
 
     for (let spell of Object.keys(lib_spells)) {

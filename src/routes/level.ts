@@ -26,14 +26,15 @@ import anime from "animejs/lib/anime.es";
 import {mobs_map} from "../game/behaviours/mobs";
 import get_godlike from "../game/get_godlike";
 import {anim_hand_selection, remove_active_elem, touch_end, touch_move, touch_start} from "../animations/card_movement";
-import {from_v, to_v, v} from "../game/local_math";
+import {from_v, pattern_col, pattern_row, relative, to_v, v} from "../game/local_math";
 import {weapons_map} from "../game/behaviours/weapons";
-import {anim_hero_take_damage, anim_poison, anim_use_card} from "../animations/interactions";
+import {anim_deal_damage, anim_hero_take_damage, anim_poison, anim_use_card} from "../animations/interactions";
 import {extract, world_global} from "../global/create_world";
 import {init_route} from "../routing";
 import routes from "../routes";
 import {Draggable} from '@shopify/draggable';
 import {Vector} from "../ecw/vector";
+import {half_or_kill} from "../game/behaviours/util";
 
 const set_available = () => {
     const as = get_godlike.action_switch()
@@ -295,6 +296,75 @@ const process = (data) => {
     }
 }
 
+const check_coins_row = async () => {
+    console.log('%c START COIN CHECK', 'font-size:22px;color: red')
+    const for_update = []
+    const checks = [
+        {
+            positions: [[0, 0], [1, 0], [2, 0]],
+            pattern: pattern_col
+        },
+        {
+            positions: [[0, 0], [0, 1], [0, 2]],
+            pattern: pattern_row
+        }
+    ]
+    for (let {positions, pattern} of checks) {
+        for (let p of positions) {
+            const ent = world.qo(new OnBoard(from_v(p)))
+            const column = relative(ent, [], pattern)
+            const types = column.filter(ent => ent.get(CardType) === E_CardType.coin && !ent.get(CardVariant))
+            if (types.length !== 3)
+                continue
+            for_update.push(...column)
+        }
+    }
+    if (for_update.length)
+        await sleep(650)
+
+    for_update.forEach(ent => {
+        ent.add(new CardVariant('ruby'))
+        ent.modify(Value).mul(7)
+        flip_card(q('#card-' + ent.get(OnBoard)))
+        console.log('replace')
+    })
+}
+
+
+const check_mobs_between_coins = async () => {
+    console.log('%c START between CHECK', 'font-size:22px;color: red')
+    const for_update = []
+    const checks = [
+        {
+            positions: [[0, 0], [1, 0], [2, 0]],
+            pattern: pattern_col
+        },
+        {
+            positions: [[0, 0], [0, 1], [0, 2]],
+            pattern: pattern_row
+        }
+    ]
+    for (let {positions, pattern} of checks) {
+        for (let p of positions) {
+            const ent = world.qo(new OnBoard(from_v(p)))
+            const column = relative(ent, [], pattern)
+            const is_coin = ent => ent.get(CardType) === E_CardType.coin && !ent.get(CardVariant)
+            const is_mob = ent => ent.get(CardType) === E_CardType.mob
+
+            if (!(is_coin(column[0]) && is_mob(column[1]) && is_coin(column[2])))
+                continue
+            for_update.push(column[1])
+        }
+    }
+    if (for_update.length)
+        await sleep(350)
+
+    for_update.forEach(ent => {
+        half_or_kill(ent)
+        anim_deal_damage(ent)
+    })
+}
+
 const process_event = async (data) => {
     if (!is_available())
         return
@@ -302,11 +372,20 @@ const process_event = async (data) => {
 
 
     const delay = process(data)
+
+
     if (delay === undefined) {
+
+        await check_mobs_between_coins()
+        await check_coins_row()
         set_available()
     }
     if (delay >= 0) {
-        setTimeout(set_available, delay + 5)
+        setTimeout(async () => {
+            await check_mobs_between_coins()
+            await check_coins_row()
+            set_available()
+        }, delay + 5)
     }
 }
 
@@ -598,7 +677,7 @@ const end_turn = async () => {
         return
     console.log('end turn')
     set_unavailable()
-
+    await sleep(20)
 
 
     actions.remove_faded()
@@ -617,12 +696,13 @@ const end_turn = async () => {
 
     await move_deck()
 
-    console.log('PD',get_godlike.player_data())
+    console.log('PD', get_godlike.player_data())
     const activate_poison_anim = actions.apply_poison()
     if (activate_poison_anim) {
+        await sleep(200)
         anim_hero_take_damage()
         anim_poison()
-        await sleep(350)
+        // await sleep(350)
     } else {
         anim_poison()
     }
