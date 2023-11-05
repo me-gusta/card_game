@@ -264,6 +264,17 @@ $header_height: 43px;
   color: $header_color;
   font-size: 16px;
 
+  &-poison {
+    .icon {
+      width: 24px;
+      height: 24px;
+      background-image: url("../images/level/poison.png");
+
+    }
+    position: absolute;
+    left: 110%;
+  }
+
   &-row {
     display: flex;
     align-items: center;
@@ -281,8 +292,10 @@ $header_height: 43px;
     display: flex;
     flex-direction: column;
     height: 100%;
-    justify-content: center;
-    gap: 5px
+    justify-content: space-between;
+    padding: 5px 0;
+    gap: 5px;
+    position: relative;
   }
 
   .icon {

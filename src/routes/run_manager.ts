@@ -124,9 +124,9 @@ const generate_cards = () => {
                 "bat": 10
             },
             "special": {
-                "hound": 65,
-                "zombie": 15,
-                "rat": 20,
+                "hound": 20,
+                "zombie": "",
+                "rat": 80,
                 "worm": "",
                 "dragon": ""
             }
@@ -150,7 +150,7 @@ const generate_cards = () => {
     }
 
     return {
-        cards: generate(gen_data)
+        cards: generate(dummy_gen_data)
     }
 }
 

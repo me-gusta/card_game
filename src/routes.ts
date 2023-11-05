@@ -67,6 +67,12 @@ const level = {
                                 <span class="power">1</span>
                             </div>
                         </div>
+                        <div class="statistics-row statistics-poison">
+                            <div class="icon"></div>
+                            <div class="statistics-text">
+                                <span class="poison"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

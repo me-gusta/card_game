@@ -19,7 +19,7 @@ import {
     anim_collect_card, anim_collect_coins,
     anim_fade_card, anim_hero_heal,
     anim_hero_take_damage,
-    anim_new_weapon, anim_weapon_exit, anim_weapon_move
+    anim_new_weapon, anim_poison, anim_weapon_exit, anim_weapon_move
 } from "../animations/interactions";
 import {update_card} from "../animations/flip";
 import anime from "animejs/lib/anime.es.js";
@@ -61,6 +61,7 @@ const consume_card = (on_board_id: number) => {
             anim_collect_card(card)
             anim_hero_heal()
             world.killEntity(card)
+            anim_poison()
             break
         }
         case E_CardType.mob: {
@@ -92,16 +93,16 @@ const consume_card = (on_board_id: number) => {
         }
 
         case E_CardType.weapon: {
-            anim_fade_card(card)
+            anim_collect_card(card)
 
             const in_hand = world.q(InHand)
             in_hand.sort((a, b) => a.get(InHand) - b.get(InHand))
 
-            console.log(in_hand.map(ent => {
-                return {
-                    id: ent.id, in_hand: ent.get(InHand)
-                }
-            }))
+            // console.log(in_hand.map(ent => {
+            //     return {
+            //         id: ent.id, in_hand: ent.get(InHand)
+            //     }
+            // }))
 
             let in_hand_id = in_hand.length
             if (in_hand.length === 3) {
@@ -226,18 +227,18 @@ const consume_card = (on_board_id: number) => {
                 //
                 // }
                 const reserved = in_hand.map(ent => ent.get(InHand))
-                console.log(reserved)
+                // console.log(reserved)
                 for (let i = 0; i < 3; i++) {
-                    console.log(i, in_array(reserved, i))
+                    // console.log(i, in_array(reserved, i))
                     if (!in_array(reserved, i)) {
-                        anim_collect_card(card)
+                        // anim_collect_card(card)
 
 
                         card.remove(OnBoard)
                         card.add(new InHand(i))
 
                         update_card(q('#card-hand' + i), true)
-                        console.log('#card-hand' + i)
+                        // console.log('#card-hand' + i)
                         anim_new_weapon(i)
                         break
                     }
@@ -351,21 +352,23 @@ const start_turn = () => {
         on_turn_start(ent)
     })
 }
-const end_turn = () => {
+const apply_poison = () => {
     // APPLY EFFECTS
     const player = get_godlike.player_data()
     const godlike = get_godlike.godlike()
 
     if (godlike.has(EffectPoisoned)) {
         const value = godlike.get(EffectPoisoned)
-        player.hp -= 1
+        player.hp -= godlike.get(EffectPoisoned)
         if (value === 1) {
             godlike.remove(EffectPoisoned)
         } else {
             godlike.modify(EffectPoisoned).sub(1)
         }
+        return true
+    } else {
+        return false
     }
-
 }
 
 const trigger_on_end_turn = () => {
@@ -404,6 +407,6 @@ export default {
     ensure_faded,
     remove_faded,
     start_turn,
-    end_turn,
+    apply_poison,
     trigger_on_end_turn
 }

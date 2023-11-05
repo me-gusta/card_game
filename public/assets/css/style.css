@@ -215,6 +215,15 @@ img {
   color: #f1f6f0;
   font-size: 16px;
 }
+.statistics-poison {
+  position: absolute;
+  left: 110%;
+}
+.statistics-poison .icon {
+  width: 24px;
+  height: 24px;
+  background-image: url("../images/level/poison.png");
+}
 .statistics-row {
   display: flex;
   align-items: center;
@@ -230,8 +239,10 @@ img {
   display: flex;
   flex-direction: column;
   height: 100%;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 5px 0;
   gap: 5px;
+  position: relative;
 }
 .statistics .icon {
   image-rendering: pixelated;

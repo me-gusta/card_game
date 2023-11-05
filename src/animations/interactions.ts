@@ -1,5 +1,5 @@
 import anime from "animejs/lib/anime.es.js";
-import {CardVariant, InHand, OnBoard, Value} from "../game/components";
+import {CardVariant, EffectPoisoned, InHand, OnBoard, Value} from "../game/components";
 import get_godlike from "../game/get_godlike";
 import {q} from "./helpers";
 
@@ -139,6 +139,18 @@ export const anim_set_hp = () => {
 export const anim_hero_take_damage = () => {
     anim_set_hp()
     anime_shake('.statistics-portrait')
+    anime({
+        targets: '.statistics-hp .icon',
+        duration: 100,
+        easing: 'easeOutSine',
+        scale: 0.8,
+        direction: 'alternate',
+        complete: () => {
+            anime.set('.statistics-hp .icon', {
+                scale: 1
+            })
+        }
+    })
 }
 
 export const anim_collect_coins = () => {
@@ -205,4 +217,30 @@ export const anim_deal_damage = (ent) => {
     });
 
     anim_bounce_card(card)
+}
+
+export const anim_poison = () => {
+    const godlike = get_godlike.godlike()
+    const elem = q('.statistics-poison')
+    let opacity
+    if (godlike.has(EffectPoisoned)) {
+        opacity = 1
+        console.log(godlike.get(EffectPoisoned))
+        q('.poison').textContent = godlike.get(EffectPoisoned)
+        anime({
+            targets: '.statistics-poison .icon',
+            duration: 100,
+            easing: 'easeOutSine',
+            scale: 1.3,
+            direction: 'alternate'
+        })
+    } else {
+        opacity = 0
+    }
+    anime({
+        targets: elem,
+        duration: 100,
+        easing: 'easeOutSine',
+        opacity: opacity
+    })
 }

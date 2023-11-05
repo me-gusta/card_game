@@ -28,7 +28,7 @@ import get_godlike from "../game/get_godlike";
 import {anim_hand_selection, remove_active_elem, touch_end, touch_move, touch_start} from "../animations/card_movement";
 import {from_v, to_v, v} from "../game/local_math";
 import {weapons_map} from "../game/behaviours/weapons";
-import {anim_use_card} from "../animations/interactions";
+import {anim_hero_take_damage, anim_poison, anim_use_card} from "../animations/interactions";
 import {extract, world_global} from "../global/create_world";
 import {init_route} from "../routing";
 import routes from "../routes";
@@ -529,7 +529,7 @@ const move_deck = async () => {
 
     for (let x = 2; x >= 0; x--) {
         actions.consume_card(x)
-        await sleep(55)
+        await sleep(155)
 
     }
 
@@ -598,7 +598,8 @@ const end_turn = async () => {
         return
     console.log('end turn')
     set_unavailable()
-    actions.end_turn()
+
+
 
     actions.remove_faded()
     anim_faded()
@@ -609,13 +610,22 @@ const end_turn = async () => {
             await sleep(350 + 400)
         else
             await sleep(350)
-        console.log('epyy')
     }
 
     const pd = get_godlike.player_data()
     pd.swipe_points = pd.swipe_points_max
 
     await move_deck()
+
+    console.log('PD',get_godlike.player_data())
+    const activate_poison_anim = actions.apply_poison()
+    if (activate_poison_anim) {
+        anim_hero_take_damage()
+        anim_poison()
+        await sleep(350)
+    } else {
+        anim_poison()
+    }
 
     // await sleep(10)
 
