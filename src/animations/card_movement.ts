@@ -93,7 +93,7 @@ const set_transform = (elem, offset) => {
 }
 const anim_toggle_card = (i) => {
     const ent = world.qo(new InHand(i))
-    const card = document.querySelector('#card-hand' + i)
+    const card = document.querySelector('#card-hand' + i +':not(.draggable--over)')
     const class_list = card.parentElement.classList
 
     const is_active = class_list.contains('active')
@@ -118,6 +118,8 @@ const anim_toggle_card = (i) => {
             scale: 1
         })
     } else if (ent.get(IsChosen)) {
+        console.log('%c CARD CHOSEN', 'color:red;font-size:24px')
+        console.log(card)
         anim_choose_card(card)
     }
 }
